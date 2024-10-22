@@ -1,42 +1,51 @@
 <template>
-    <nav class="bg-gray-800 text-white">
-        <!-- Botón de menú para móviles -->
-        <div class="md:hidden flex items-center justify-between p-4">
-            <h1 class="text-xl font-semibold">Menú</h1>
-            <button @click="isOpen = !isOpen" class="focus:outline-none">
-                <svg v-if="!isOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
-                    </path>
-                </svg>
-                <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Menú completo para pantallas medianas y grandes -->
-        <div :class="isOpen ? 'block' : 'hidden'" class="md:block">
-            <ul class="p-4 space-y-4">
-                <li><router-link to="/generar-facturas" class="block py-2 px-4 hover:bg-gray-700 rounded">Generar
-                        Facturas</router-link></li>
-                <li><router-link to="/subir-archivo" class="block py-2 px-4 hover:bg-gray-700 rounded">Subir
-                        Archivo</router-link></li>
-                <li><router-link to="/configuracion"
-                        class="block py-2 px-4 hover:bg-gray-700 rounded">Administración de usuarios</router-link></li>
-            </ul>
-        </div>
-    </nav>
+    <el-menu active-text-color="#ffd04b" background-color="#1F2937" class="el-menu-vertical-demo" default-active="2"
+        text-color="#fff" @open="handleOpen" @close="handleClose">
+        <el-sub-menu index="1">
+            <template #title>
+                <el-icon>
+                    <location />
+                </el-icon>
+                <span>Administración</span>
+            </template>
+            <el-menu-item index="1-1">Crear bodegas</el-menu-item>
+            <el-menu-item index="1-2">Gestionar usuarios</el-menu-item>
+            <el-menu-item index="1-3">Crear clientes y terceros</el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="2">
+            <template #title>
+                <el-icon>
+                    <location />
+                </el-icon>
+                <span>Facturación</span>
+            </template>
+            <el-menu-item index="2-1">Facturación</el-menu-item>
+            <el-menu-item index="2-2">Nota crédito</el-menu-item>
+            <el-menu-item index="2-3">Nota debito</el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="3">
+            <template #title>
+                <el-icon>
+                    <location />
+                </el-icon>
+                <span>Utlidades</span>
+            </template>
+            <el-menu-item index="3-1">Importar archivo plano</el-menu-item>
+        </el-sub-menu>
+    </el-menu>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-
-const isOpen = ref(false);
+<script lang="ts" setup>
+import {
+    Document,
+    Menu as IconMenu,
+    Location,
+    Setting,
+} from '@element-plus/icons-vue'
+const handleOpen = (key: string, keyPath: string[]) => {
+    console.log(key, keyPath)
+}
+const handleClose = (key: string, keyPath: string[]) => {
+    console.log(key, keyPath)
+}
 </script>
-
-<style scoped>
-/* Puedes añadir más estilos personalizados aquí si es necesario */
-</style>
