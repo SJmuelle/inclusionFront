@@ -10,6 +10,8 @@
 
             <!-- Contenido principal -->
             <main class="flex-grow overflow-y-auto">
+<header></header>
+                
                 <router-view></router-view>
                 <!-- Footer al final de la página -->
                 <footer class="bg-gray-200">
@@ -29,6 +31,7 @@
 import { RouterView } from 'vue-router'
 import Footer from '@/components/design/Footer.vue'
 import Navigation from '@/components/design/Navigation.vue'
+import header from '@/components/design/header.vue'
 import Shortcuts from '@/components/design/Shortcuts.vue'
 
 </script>

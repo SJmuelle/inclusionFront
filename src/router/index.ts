@@ -19,7 +19,7 @@ const routes = [
     component: () => import('../layouts/AdminLayout.vue'),
     children: [
       {
-        path: '',
+        path: 'sale',
         name: 'sale',
         component: () => import('../views/sale/sale.vue'),
         meta: { requireAuth: true },
@@ -29,12 +29,33 @@ const routes = [
         name: 'perfil',
         component: () => import('../views/perfil/formPerfil.vue'),
         meta: { requireAuth: true },
-      }
+      },
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('../views/dashboard/dashboard.vue'), // Asegúrate de que exista este componente
+        meta: { requireAuth: false},
+      },
+
+
+      {
+        path: 'bodega',
+        name: 'bodega',
+        component: () => import('../views/bodegas/bodega.vue'), // Asegúrate de que exista este componente
+        meta: { requireAuth: false},
+      },
+
+      {
+        path: 'tercero',
+        name: 'tercero',
+        component: () => import('../views/terceros/terceros.vue'), // Asegúrate de que exista este componente
+        meta: { requireAuth: false},
+      },
     ]
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: { name: 'login' }
+    redirect: { name: 'dashboard' }
   }
 ];
 
