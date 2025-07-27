@@ -8,19 +8,18 @@
       </span>
       <template #dropdown>
         <!-- Dropdown menu -->
-        <el-dropdown-menu class="  divide-y divide-gray-100 shadow  border border-white">
-          <el-dropdown-item disabled class="px-4 py-3 text-sm text-violet-950">
-            <div>Holaaa, {{ user?.nombres.split(' ')[0] }}</div>
+        <el-dropdown-menu class="divide-y divide-gray-100 shadow border border-blue-200">
+          <el-dropdown-item disabled class="px-4 py-3 text-sm text-blue-800">
+            <div>Hola, {{ user?.nombres.split(' ')[0] }}</div>
             <div>{{ user?.company }}</div>
           </el-dropdown-item>
-          <el-dropdown-item class="py-2 text-sm text-violet-950">Perfil</el-dropdown-item>
+          <el-dropdown-item class="py-2 text-sm text-blue-700 hover:bg-blue-50">Perfil</el-dropdown-item>
           <el-dropdown-item href="#" @click="signOut"
-            class="block px-4 py-2 text-sm  hover:bg-violet-950 ">Cerrar sesión</el-dropdown-item>
+            class="block px-4 py-2 text-sm hover:bg-blue-50 text-blue-700">Cerrar sesión</el-dropdown-item>
         </el-dropdown-menu>
       </template>
     </el-dropdown>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -35,7 +34,6 @@ const signOut = () => {
   AuthService.logout();
   router.push('/');
 };
-
 </script>
 
 <style scoped>

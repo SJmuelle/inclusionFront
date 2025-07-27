@@ -1,9 +1,9 @@
 <template>
     <div>
-        <a class="flex items-center space-x-3 rtl:space-x-reverse flex-none  p-2 rounded-md " @click="refresk">
-            <img :src="logoPath" class="h-12 border-white" :alt="Empresa" :class="Empresa!='torres'?'border-2 border-white rounded-full':''" />
+        <a class="flex items-center space-x-3 rtl:space-x-reverse flex-none p-2 rounded-md" @click="refresk">
+            <img :src="logoPath" class="h-12 border-blue-200" :alt="Empresa" :class="Empresa!='torres'?'border-2 border-blue-200 rounded-full':''" />
             <span
-                class="self-center text-2xl  whitespace-nowrap text-white border-b-2 border-white font-extrabold">SOFT-IA</span>
+                class="self-center text-2xl whitespace-nowrap text-blue-800 border-b-2 border-blue-200 font-extrabold">SOFT-IA</span>
         </a>
     </div>
 </template>
@@ -48,6 +48,4 @@ onMounted(() => {
         logoPath.value = `src/assets/isotipo/${Empresa.value}.png`;
     }
 });
-
-
 </script>

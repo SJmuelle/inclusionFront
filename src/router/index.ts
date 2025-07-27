@@ -19,43 +19,52 @@ const routes = [
     component: () => import('../layouts/AdminLayout.vue'),
     children: [
       {
-        path: 'sale',
-        name: 'sale',
-        component: () => import('../views/sale/sale.vue'),
-        meta: { requireAuth: true },
-      },
-      {
         path: 'perfil',
         name: 'perfil',
         component: () => import('../views/perfil/formPerfil.vue'),
         meta: { requireAuth: true },
       },
       {
-        path: 'dashboard',
-        name: 'dashboard',
-        component: () => import('../views/dashboard/dashboard.vue'), // Asegúrate de que exista este componente
-        meta: { requireAuth: false},
+        path: 'estudiantes',
+        name: 'estudiantes',
+        component: () => import('../components/StudentForm.vue'),
+        meta: { requireAuth: true },
       },
-
-
       {
-        path: 'bodega',
-        name: 'bodega',
-        component: () => import('../views/bodegas/bodega.vue'), // Asegúrate de que exista este componente
-        meta: { requireAuth: false},
+        path: 'piar',
+        name: 'piar',
+        component: () => import('../views/piar/PiarForm.vue'),
+        meta: { requireAuth: true },
       },
-
       {
-        path: 'tercero',
-        name: 'tercero',
-        component: () => import('../views/terceros/terceros.vue'), // Asegúrate de que exista este componente
-        meta: { requireAuth: false},
+        path: 'seguimiento',
+        name: 'seguimiento',
+        component: () => import('../views/seguimiento/SeguimientoForm.vue'),
+        meta: { requireAuth: true },
+      },
+      {
+        path: 'actores',
+        name: 'actores',
+        component: () => import('../views/actores/ActoresForm.vue'),
+        meta: { requireAuth: true },
+      },
+      {
+        path: 'reportes',
+        name: 'reportes',
+        component: () => import('../views/reportes/ReportesView.vue'),
+        meta: { requireAuth: true },
+      },
+      {
+        path: 'configurar-roles',
+        name: 'configurar-roles',
+        component: () => import('../views/admin/ConfigurarRoles.vue'),
+        meta: { requireAuth: true, requireAdmin: true },
       },
     ]
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: { name: 'dashboard' }
+    redirect: { name: 'perfil' }
   }
 ];
 

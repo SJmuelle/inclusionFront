@@ -1,6 +1,11 @@
 <template>
-    <el-autocomplete v-model="state" :fetch-suggestions="querySearchAsync" placeholder="Buscar"
-        @select="handleSelect" />
+    <el-autocomplete 
+        v-model="state" 
+        :fetch-suggestions="querySearchAsync" 
+        placeholder="Buscar"
+        @select="handleSelect"
+        class="search-input"
+    />
 </template>
 
 <script lang="ts" setup>
@@ -49,3 +54,20 @@ onMounted(async () => {
     await loadAll();
 });
 </script>
+
+<style scoped>
+.search-input :deep(.el-input__wrapper) {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.search-input :deep(.el-input__wrapper:hover) {
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 1px #1d4ed8;
+}
+
+.search-input :deep(.el-input__wrapper.is-focus) {
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 1px #1d4ed8;
+}
+</style>

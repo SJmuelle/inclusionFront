@@ -24,15 +24,6 @@ export class AuthService {
         const response = await httpRequest('GET', AppSettingsService.auth.url.userInfo);
         if (response.success) {
             localStorage.setItem('propExt', JSON.stringify(response.data.propExt));
-            let getPropExt = AuthService.getPropExt();
-            if (!(getPropExt.WEPOS && getPropExt.WEPOS.length > 0)) {
-                let data = {
-                    "success": false,
-                    "message": "No tiene permiso para entrar al W-pos",
-                    "type": 2
-                }
-                return data;
-            }
         }
         response.type = 1
         return response;
@@ -48,10 +39,6 @@ export class AuthService {
 
     static isAuthenticated(): Boolean {
         let res: Boolean = !!localStorage.getItem('token')
-        if (res) {
-            let getPropExt = AuthService.getPropExt();
-            return getPropExt.WEPOS && getPropExt.WEPOS.length > 0
-        }
         return res;
     }
 
