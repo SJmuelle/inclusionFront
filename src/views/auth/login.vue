@@ -1,10 +1,9 @@
 <template>
-  <div class="login-bg min-h-screen flex items-center justify-center">
-    <div class="login-card w-full max-w-md bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="w-full p-8 flex flex-col items-center">
       <div class="mb-6 flex flex-col items-center">
-        <img src="/public/img/favicon.jpg" alt="Logo" class="w-16 h-16 rounded-full mb-2" />
-        <h1 class="text-2xl font-bold text-gray-800 mb-1">Sistema PIAR</h1>
-        <p class="text-gray-500 text-sm">Bienvenido, inicia sesión para continuar</p>
+         <!-- <img src="/src/assets/alcaldiaBarranquilla.png" alt="Logo" class="w-16 h-16 rounded-full mb-2" /> -->
+        <p class="text-gray-500 text-xl">Bienvenido, inicia sesión para continuar</p>
       </div>
       <el-form ref="loginForm" class="w-full" label-position="top" :model="form" :rules="rules" @submit.prevent="handleSubmit">
         <el-form-item class="mb-4" prop="usuario" label="Usuario">
@@ -26,7 +25,6 @@
         </el-form-item>
         <el-alert v-if="error" :title="error" type="error" show-icon class="mb-2" />
       </el-form>
-      <div class="mt-4 text-sm text-gray-500">¿Olvidaste tu contraseña? <a href="#" class="text-blue-600 hover:underline">Recupérala aquí</a></div>
     </div>
   </div>
 </template>
@@ -78,10 +76,5 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.login-bg {
-  background: linear-gradient(120deg, #f0f4f8 0%, #e0e7ef 100%);
-}
-.login-card {
-  box-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.10);
-}
+
 </style>
