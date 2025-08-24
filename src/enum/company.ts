@@ -1,5 +1,3 @@
-export const company = {
-    economia: 'economia',
-    torres: 'torres',
-    isimo: 'isimo'
+export const colegio = {
+    nombre: 'Colegio Inclusivo',
 };

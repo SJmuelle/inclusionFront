@@ -33,7 +33,7 @@ const routes = [
       {
         path: 'piar',
         name: 'piar',
-        component: () => import('../views/piar/PiarForm.vue'),
+        component: () => import('../views/piar/piarListados.vue'),
         meta: { requireAuth: true },
       },
       {

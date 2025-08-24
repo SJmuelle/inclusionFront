@@ -3,7 +3,9 @@
     <div class="max-w-6xl mx-auto">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-          <el-icon><UserFilled /></el-icon>
+          <el-icon>
+            <UserFilled />
+          </el-icon>
           Gestión de Estudiantes
         </h1>
         <p class="text-gray-600">Registre y gestione los datos de los estudiantes</p>
@@ -11,68 +13,89 @@
       <el-tabs v-model="activeTab" class="custom-tabs">
         <el-tab-pane name="datosPersonales">
           <template #label>
-            <el-icon><User /></el-icon>
+            <el-icon>
+              <User />
+            </el-icon>
             <span style="margin-left: 6px;">Datos Personales</span>
           </template>
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2 flex items-center gap-2">
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User />
+              </el-icon>
               Datos Personales
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <el-form-item label="Nombres" prop="nombres">
                 <el-input v-model="form.nombres" placeholder="Ingrese nombres" class="custom-input">
                   <template #prefix>
-                    <el-icon><User /></el-icon>
+                    <el-icon>
+                      <User />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item label="Apellidos" prop="apellidos">
                 <el-input v-model="form.apellidos" placeholder="Ingrese apellidos" class="custom-input">
                   <template #prefix>
-                    <el-icon><User /></el-icon>
+                    <el-icon>
+                      <User />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item label="Fecha de Nacimiento" prop="fechaNacimiento">
-                <el-date-picker v-model="form.fechaNacimiento" type="date" placeholder="Seleccione fecha" class="custom-input w-full">
+                <el-date-picker v-model="form.fechaNacimiento" type="date" placeholder="Seleccione fecha"
+                  class="custom-input w-full">
                   <template #prefix>
-                    <el-icon><Calendar /></el-icon>
+                    <el-icon>
+                      <Calendar />
+                    </el-icon>
                   </template>
                 </el-date-picker>
               </el-form-item>
               <el-form-item label="Tipo de Documento" prop="tipoDocumento">
                 <el-input v-model="form.tipoDocumento" placeholder="Tipo de documento" class="custom-input">
                   <template #prefix>
-                    <el-icon><Document /></el-icon>
+                    <el-icon>
+                      <Document />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item label="Documento" prop="documento">
                 <el-input v-model="form.documento" placeholder="Número de documento" class="custom-input">
                   <template #prefix>
-                    <el-icon><Document /></el-icon>
+                    <el-icon>
+                      <Document />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item label="Género" prop="genero">
                 <el-input v-model="form.genero" placeholder="Género" class="custom-input">
                   <template #prefix>
-                    <el-icon><UserFilled /></el-icon>
+                    <el-icon>
+                      <UserFilled />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item label="Teléfono" prop="telefono">
                 <el-input v-model="form.telefono" placeholder="Teléfono" class="custom-input">
                   <template #prefix>
-                    <el-icon><Phone /></el-icon>
+                    <el-icon>
+                      <Phone />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
               <el-form-item label="Email" prop="email">
                 <el-input v-model="form.email" placeholder="Email" class="custom-input">
                   <template #prefix>
-                    <el-icon><Message /></el-icon>
+                    <el-icon>
+                      <Message />
+                    </el-icon>
                   </template>
                 </el-input>
               </el-form-item>
@@ -84,11 +107,15 @@
       </el-tabs>
       <div class="flex justify-end space-x-4 mt-6">
         <el-button @click="resetForm" class="custom-button-secondary">
-          <el-icon><Delete /></el-icon>
+          <el-icon>
+            <Delete />
+          </el-icon>
           Limpiar
         </el-button>
         <el-button type="primary" @click="submitForm" class="custom-button-primary">
-          <el-icon><CirclePlus /></el-icon>
+          <el-icon>
+            <CirclePlus />
+          </el-icon>
           Guardar Estudiante
         </el-button>
       </div>
@@ -99,11 +126,7 @@
           <h2 class="text-xl font-semibold text-gray-900">Estudiantes Registrados</h2>
         </div>
         <div class="p-6">
-          <el-table 
-            :data="estudiantes" 
-            style="width: 100%"
-            class="custom-table"
-          >
+          <el-table :data="estudiantes" style="width: 100%" class="custom-table">
             <el-table-column prop="nombres" label="Nombres" />
             <el-table-column prop="apellidos" label="Apellidos" />
             <el-table-column prop="documento" label="Documento" />
@@ -112,19 +135,11 @@
             <el-table-column prop="eps" label="EPS" />
             <el-table-column label="Acciones" width="200">
               <template #default="scope">
-                <el-button 
-                  size="small" 
-                  @click="editarEstudiante(scope.row)"
-                  class="custom-button-secondary"
-                >
+                <el-button size="small" @click="editarEstudiante(scope.row)" class="custom-button-secondary">
                   Editar
                 </el-button>
-                <el-button 
-                  size="small" 
-                  type="danger" 
-                  @click="eliminarEstudiante(scope.row)"
-                  class="custom-button-danger"
-                >
+                <el-button size="small" type="danger" @click="eliminarEstudiante(scope.row)"
+                  class="custom-button-danger">
                   Eliminar
                 </el-button>
               </template>
@@ -276,10 +291,10 @@ const submitForm = () => {
     ElMessage.error('Por favor complete los campos requeridos')
     return
   }
-  
+
   const nuevoEstudiante = { ...form, id: Date.now() }
   estudiantes.value.push(nuevoEstudiante)
-  
+
   ElMessage.success('Estudiante guardado exitosamente')
   resetForm()
 }
@@ -492,4 +507,4 @@ const eliminarEstudiante = (estudiante: Estudiante) => {
 .custom-input :deep(.el-textarea__inner::placeholder) {
   color: #9ca3af;
 }
-</style> 
+</style>

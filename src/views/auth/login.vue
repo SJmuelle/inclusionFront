@@ -7,7 +7,7 @@
       </div>
       <el-form ref="loginForm" class="w-full" label-position="top" :model="form" :rules="rules" @submit.prevent="handleSubmit">
         <el-form-item class="mb-4" prop="usuario" label="Usuario">
-          <el-input v-model="form.usuario" placeholder="Usuario" size="large">
+          <el-input v-model="form.usuario" placeholder="Usuario" size="large" autocomplete="off">
             <template #prefix>
               <el-icon><User /></el-icon>
             </template>
@@ -37,13 +37,14 @@ import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Action } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
+import { lo } from 'element-plus/es/locales.mjs';
 
 const labelPosition = ref<FormProps['labelPosition']>('right')
 const router = useRouter();
 const error = ref<string>('');
 const form = reactive({
-    usuario: '',
-    password: '',
+    usuario: 'admin@piar.com',
+    password: 'admin',
 })
 
 const rules = {
@@ -56,23 +57,29 @@ const rules = {
 };
 
 const handleSubmit = async () => {
-    router.push('/admin');
-    // try {
-    //     const response = await AuthService.login({ username: form.usuario, password: form.password });
-    //     if (response.success) {
-    //         router.push('/admin');
-    //     } else {
-    //         error.value = response.message;
-    //         if (response.type == 2) {
-    //             ElMessageBox.alert(`${response.message}`, 'Autenticación exitosa', {
-    //                 confirmButtonText: 'OK',
-    //             })
-    //         }
-    //     }
-    // } catch (err: any) {
-    //     error.value = err.message;
-    // }
+   
+    try {
+        const response = await AuthService.login({ username: form.usuario, password: form.password });
+      
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('usuario', JSON.stringify(response.usuario));
+            router.push('/admin');
+        } else {
+            error.value = response.message;
+            if (response.type == 2) {
+                ElMessageBox.alert(`${response.message}`, 'Autenticación exitosa', {
+                    confirmButtonText: 'OK',
+                })
+            }
+        }
+    } catch (err: any) {
+        error.value = err.message;
+    }
 };
+
+
+
 </script>
 
 <style scoped>

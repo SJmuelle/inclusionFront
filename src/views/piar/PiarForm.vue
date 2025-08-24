@@ -530,7 +530,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Notebook, User, Star, Delete, CirclePlus, Edit, Target, Calendar, Check, Warning, Message } from '@element-plus/icons-vue'
+import { Notebook, User, Star, Delete, CirclePlus, Edit,  Calendar, Check, Warning, Message } from '@element-plus/icons-vue'
 
 interface Estudiante {
   id: number

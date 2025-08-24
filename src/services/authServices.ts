@@ -14,14 +14,36 @@ export class AuthService {
 
         if (response.success) {
             this.setToken(response.data);
+
             return AuthService.setUserInfo()
         }
         return response;
 
     }
 
+
+    static async ejecutarSP(p0: string, parametros: { spName: string; params: any[]; }) {
+        try {
+            const response = await httpRequest(
+                'POST',
+                AppSettingsService.auth.url.listarEstu,
+                {
+                    spName: parametros.spName,
+                    params: parametros.params
+                }
+            );
+
+            console.log("Respuesta SP:", response);
+            return response;
+        } catch (err) {
+            console.error("Error ejecutando SP:", err);
+            throw err;
+        }
+    }
+
+
     private static async setUserInfo() {
-        const response = await httpRequest('GET', AppSettingsService.auth.url.userInfo);
+        const response = await httpRequest('POST', AppSettingsService.auth.url.userInfo);
         if (response.success) {
             localStorage.setItem('propExt', JSON.stringify(response.data.propExt));
         }
@@ -61,6 +83,8 @@ export class AuthService {
     static getPropExt(): any {
         return JSON.parse(localStorage.getItem('propExt') + '');
     }
+
+
 
 
 
