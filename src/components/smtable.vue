@@ -38,11 +38,11 @@
                                     }}</el-button>
                             </span>
                             <span v-else-if="columna.mascara === 'estado'">
-                                <el-tag v-if="scope.row[columna.prop] == 'Terminado'" type="danger">
+                                <el-tag v-if="scope.row[columna.prop] == 'Terminado'" type="success">
                                     Terminado
                                 </el-tag>
 
-                                <el-tag v-else type="success">
+                                <el-tag v-else type="danger">
                                     Pendiente
                                 </el-tag>
                             </span>
@@ -108,8 +108,8 @@
                                 </div>
                             </span>
                             <span v-else-if="columna.mascara === 'boton-icon'">
-                                <el-button @click="notificarPadre(scope.row, 'edito')"
-                                    class="bg-green-400 text-white hover:bg-green-50 hover:text-green-400 hover:border-green-400 border-2"
+                                <el-button @click="notificarPadre(scope.row, 'edito')" 
+                                    class="bg-blue-400 text-white hover:bg-blue-50 hover:text-blue-400 hover:border-blue-400 border-2"
                                     round :icon="Edit" circle></el-button>
                             </span>
 
@@ -118,6 +118,13 @@
                                 <el-button @click="notificarPadre(scope.row, 'elimino')"
                                     class="bg-red-400 text-white hover:bg-red-50 hover:text-red-400 hover:border-red-400 border-2"
                                     round :icon="DeleteFilled" circle></el-button>
+
+                            </span>
+                            <span v-else-if="columna.mascara === 'barra'">
+                            
+                               <el-progress v-if="scope.row[columna.prop]==100"  :percentage="scope.row[columna.prop] " status="success"></el-progress>
+                               <el-progress v-if="scope.row[columna.prop]==0" :percentage="scope.row[columna.prop]" status="exception"></el-progress>
+                               <el-progress  v-else :percentage="scope.row[columna.prop] " color="orange"></el-progress>
 
                             </span>
                             <span v-else :class="getDynamicClass(columna, scope.row[columna.prop], scope.row)">
@@ -309,7 +316,13 @@ th {
     background: #ebeef5 !important;
     color: #90a0c2 !important;
     font-weight: 500 !important;
+  
 }
+
+tr{
+  text-transform: uppercase !important;
+}
+
 
 /* Ocultar el checkbox en el encabezado de la tabla */
 th .el-checkbox {
@@ -339,4 +352,6 @@ label.el-checkbox.is-checked {
 .amarillo {
     background: #f8ac598a !important;
 }
+
+
 </style>

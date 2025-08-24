@@ -2,6 +2,16 @@
 
   <el-menu :default-active="activeIndex.link" active-text-color="#C7D2FE" background-color="#1F2937"
     class="el-menu-vertical-demo custom-menu" text-color="#fff" @open="handleOpen" @close="handleClose" router>
+
+    <!-- LOGO + TEXTO -->
+    <div class="flex items-center px-6 ">
+      <img src="@/assets/logoBlanco.svg" alt="Logo" class="w-16" />
+      <div>
+        <span class="logo-text ">Sistema PIAR</span>
+      </div>
+
+    </div>
+
     <!-- Dashboard -->
     <el-menu-item index="/admin/dashboard" class="custom-menu-item">
       <router-link to="/admin/dashboard">
@@ -15,8 +25,10 @@
     <!-- Administración -->
     <el-sub-menu index="2" class="custom-sub-menu">
       <template #title>
-        
-        <el-icon><Refresh /></el-icon>
+
+        <el-icon>
+          <Refresh />
+        </el-icon>
         <span class="custom-menu-title">Piar</span>
       </template>
 
@@ -28,7 +40,7 @@
           Registro
         </router-link>
       </el-menu-item>
-   
+
     </el-sub-menu>
 
   </el-menu>
@@ -74,6 +86,6 @@ const handleClose = (key: string, keyPath: string[]) => {
 </script>
 <style scoped>
 ul.el-menu.el-menu--vertical.el-menu-vertical-demo.custom-menu.bg-gray-800.text-white.flex-shrink-0.w-64.hidden.md\:block {
-    border: none;
+  border: none;
 }
 </style>

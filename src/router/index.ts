@@ -37,6 +37,12 @@ const routes = [
         meta: { requireAuth: true },
       },
       {
+        path: 'piarForm/:id',
+        name: 'piarForm',
+        component: () => import('../views/piar/PiarForm.vue'),
+        meta: { requireAuth: true },
+      },
+      {
         path: 'seguimiento',
         name: 'seguimiento',
         component: () => import('../views/seguimiento/SeguimientoForm.vue'),

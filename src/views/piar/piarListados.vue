@@ -2,14 +2,14 @@
     <div class=" mx-auto p-4 ">
 
         <div class="grid md:grid-cols-4 gap-4">
-            <el-card shadow="hover"
+            <el-card shadow="hover" @click="filtroColegio(null)"
                 class=" border-purple-700  bg-gradient-to-r from-purple-50 to-purple-300 border-2  rounded-2xl">
                 <div class="grid grid-cols-1">
                     <div class="flex justify-between items-center px-4 ">
                         <div class="text-3xl font-bold text-purple-700">Total</div>
                         <div class="">
                             <span class="text-4xl  text-purple-700  font-bold  rounded-lg  ">{{
-                                total }}</span>
+                                total < 10 ? '0' + total : total }}</span>
                         </div>
                     </div>
                     <div class="flex justify-between items-center  mt-2">
@@ -41,8 +41,8 @@
             <div class="col-span-3 grid justify-center grid-cols-12 ">
                 <div class="col-span-1 flex justify-end items-center cursor hover:text-blue-700"
                     @click="carruselIzquierdaColegios">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-6">
+                    <svg v-if="primerColegio > 1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                     </svg>
 
@@ -52,13 +52,14 @@
 
 
                     <el-card v-for="(item, index) in colegios.slice(primerColegio, ultimoColegio)" :key="index"
-                        shadow="hover"
-                        :class="`border-${clases[(index + primerColegio + 1) % clases.length]}-700 bg-gradient-to-r from-${clases[(index + primerColegio + 1) % clases.length]}-50 to-${clases[(index + primerColegio + 1) % clases.length]}-300  border-2  rounded-lg`">
+                        shadow="hover" @click="filtroColegio(item)"
+                        :class="`border-${clases[(index + primerColegio + 1) % clases.length]}-700 bg-gradient-to-r from-${clases[(index + primerColegio + 1) % clases.length]}-50 to-${clases[(index + primerColegio + 1) % clases.length]}-300  ${colegioSeleccionado == item.colegio_id ? 'border-4' : ''}  rounded-lg`">
                         <div class="grid grid-cols-1">
-                            <div class="flex justify-between items-center px-4 ">
+                            <div
+                                :class="`flex  justify-between items-center gap-2 `">
                                 <div
-                                    :class="`text-lg font-bold text-${clases[(index + primerColegio + 1) % clases.length]}-700`">
-                                    {{ item.nombreColegio }}</div>
+                                    :class="`${item.colegio_nombre.length < 50 ? 'text-xs' : 'text-[9px]'} uppercase text-start font-bold text-${clases[(index + primerColegio + 1) % clases.length]}-700`">
+                                    {{ item.colegio_nombre }}</div>
                                 <div>
                                     <span
                                         :class="`text-4xl  text-${clases[(index + primerColegio + 1) % clases.length]}-700  font-bold `">{{
@@ -117,7 +118,7 @@
         <div class="m">
             <el-row>
                 <el-col v-loading="loading" class="bg-white mt-4 p-4 rounded-lg shadow-lg" :span="24">
-                    <smtable :exportar="false" :rows="Listado" :columns="encabezado" :nombreExcel="nombre">
+                    <smtable @accionDesdeHijo="seleccion" :exportar="false"  :rows="ListadoMostrar" :columns="encabezado" :nombreExcel="nombre">
                     </smtable>
                 </el-col>
             </el-row>
@@ -128,15 +129,18 @@
 import { ref, onMounted, computed } from 'vue';
 import smtable from '@/components/smtable.vue';
 import { AuthService } from '@/services/authServices';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 interface ListadoItem {
     id: number;
-    tipoDocumento: string;
-    documento: string;
-    nombre: string;
-    apellido: string;
-    idColegio: string;
-    nombreColegio: string;
-    estado: string;
+    tipo_documento: string;
+    numero_identificacion: string;
+    nombres: string;
+    apellidos: string;
+    colegio_id: string;
+    colegio_nombre: string;
+    estado_piar: string;
+    avance_piar:string
 }
 
 
@@ -169,20 +173,21 @@ const colorSchemes = [
 ];
 const loading = ref(false);
 const Listado = ref<ListadoItem[]>([]);
-const ListadoCompleto = ref<ListadoItem[]>([]);
+const ListadoMostrar = ref<ListadoItem[]>([]);
 const ultimoColegio = ref<number>(0);
 const primerColegio = ref<number>(0);
 
 
 const encabezado = ref([
-    { label: 'ID', prop: 'id' },
-    { label: 'Tipo de documento', prop: 'tipoDocumento' },
-    { label: 'Documento', prop: 'documento' },
-    { label: 'Nombre', prop: 'nombre' },
-    { label: 'Apellido', prop: 'apellido' },
-    { label: 'Id', prop: 'idColegio' },
-    { label: 'Nombre del colegio', prop: 'nombreColegio' },
-    { label: 'Estado', prop: 'estado', mascara: "estado" }
+    { label: 'ID', prop: 'id', mascara:'boton-icon' ,width:100 },
+
+    { label: 'Tipo de doc', prop: 'tipo_documento' , width:100 },
+    { label: 'Documento', prop: 'numero_identificacion' },
+    { label: 'Nombre', prop: 'nombres' },
+    { label: 'Apellido', prop: 'apellidos' },
+    { label: 'Institución Educativa', prop: 'colegio_nombre' , width:300},
+    { label: 'Estado', prop: 'estado_piar', mascara: "estado" },
+    { label: 'Porcentaje', prop: 'avance_piar', mascara: "barra", width:150  }
 ]);
 const nombre = "Listado de PIAR";
 
@@ -190,39 +195,43 @@ const total = ref(0);
 const totalPendiente = ref(0);
 const TotalTerminados = ref(0);
 
-const colegioSeleccionado = ref('');
+const colegioSeleccionado = ref(-1);
 
-const colegios = ref<{ idColegio: string; nombreColegio: string; terminados: number; pendientes: number }[]>([]);
+const colegios = ref<{ colegio_id: string; colegio_nombre: string; terminados: number; pendientes: number }[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
     loading.value = true;
-    setTimeout(async () => {
-
-        let usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-        loading.value = true;
-        let parametros = { spName: 'sp_listar_estudiantes', params: [usuario?.usuario_id] }
-        const result = await AuthService.ejecutarSP("sp_listar_estudiantes", parametros);
-
-        debugger
-        Listado.value = result;
+    let usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    loading.value = true;
+    let parametros = { spName: 'fn_listar_estudiantes_usuario', params: [usuario?.usuario_id] }
+    const result = await AuthService.ejecutarSP("fn_listar_estudiantes_usuario", parametros);
+    if (result[0].fn_listar_estudiantes_usuario) {
+        Listado.value = result[0].fn_listar_estudiantes_usuario.data;
+        ListadoMostrar.value = result[0].fn_listar_estudiantes_usuario.data;
         loading.value = false;
         total.value = Listado.value.length;
-        totalPendiente.value = Listado.value.filter(item => item.estado === 'Pendiente').length;
-        TotalTerminados.value = Listado.value.filter(item => item.estado === 'Terminado').length;
+        totalPendiente.value = Listado.value.filter(item => item.estado_piar === 'Pendiente').length;
+        TotalTerminados.value = Listado.value.filter(item => item.estado_piar === 'Terminado').length;
         colegios.value = resumenPorColegio.value;
-
         carruselPrimerColegios();
-    }, 1000);
+    } else {
+        loading.value = false;
+        Listado.value = [];
+    }
+
+
 });
 
 
 
 
-
+const seleccion=(item)=>{
+     router.push('piarForm/'+item.numero_identificacion);
+}
 
 const carruselPrimerColegios = () => {
     ultimoColegio.value = colegios.value.length;
-    if (colegios.value.length - 1 > 3) {
+    if (colegios.value.length > 3) {
         ultimoColegio.value = 3;
         primerColegio.value = 0;
     } else {
@@ -255,28 +264,40 @@ const carruselIzquierdaColegios = () => {
 
 // Calcula resumen por colegio
 const resumenPorColegio = computed(() => {
-    const resumen: Record<string, { nombreColegio: string; terminados: number; pendientes: number }> = {};
+    const resumen: Record<string, { colegio_nombre: string; terminados: number; pendientes: number }> = {};
     Listado.value.forEach(item => {
-        if (!resumen[item.idColegio]) {
-            resumen[item.idColegio] = {
-                nombreColegio: item.nombreColegio,
+        if (!resumen[item.colegio_id]) {
+            resumen[item.colegio_id] = {
+                colegio_nombre: item.colegio_nombre,
                 terminados: 0,
                 pendientes: 0
             };
         }
-        if (item.estado === 'Terminado') {
-            resumen[item.idColegio].terminados += 1;
-        } else if (item.estado === 'Pendiente') {
-            resumen[item.idColegio].pendientes += 1;
+        if (item.estado_piar === 'Terminado') {
+            resumen[item.colegio_id].terminados += 1;
+        } else if (item.estado_piar === 'Pendiente') {
+            resumen[item.colegio_id].pendientes += 1;
         }
     });
 
-    return Object.entries(resumen).map(([idColegio, data]) => ({
-        idColegio,
+    return Object.entries(resumen).map(([colegio_id, data]) => ({
+        colegio_id,
         ...data
     }));
 });
 
+const filtroColegio = (item1) => {
+    if (item1 != null) {
+        colegioSeleccionado.value = item1.colegio_id;
+        ListadoMostrar.value = Listado.value.filter(item => item.colegio_id == item1.colegio_id);
+    }else{
+           colegioSeleccionado.value =-1;
+          ListadoMostrar.value = Listado.value
+    }
 
+}
 
 </script>
+<style lang="css">
+
+</style>
