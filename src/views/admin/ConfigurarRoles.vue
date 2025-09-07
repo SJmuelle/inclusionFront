@@ -60,7 +60,7 @@ import { ref } from 'vue';
 import { MENU_OPTIONS, ROLES, ROLE_MENU_CONFIG } from '@/data/roleMenuConfig';
 import {
   User, UserFilled, Document, PieChart, Setting, Check,
-  Avatar, Notebook, Histogram, UserGroup, Tickets, InfoFilled, Menu, CircleCheck
+  Avatar, Notebook, Histogram, Tickets, InfoFilled, Menu, CircleCheck
 } from '@element-plus/icons-vue';
 import { ElNotification } from 'element-plus';
 
@@ -82,7 +82,7 @@ function saveConfig() {
 function getMenuIcon(key: string) {
   switch (key) {
     case 'perfil': return Avatar;
-    case 'estudiantes': return UserGroup;
+  
     case 'piar': return Notebook;
     case 'seguimiento': return Histogram;
     case 'actores': return Tickets;

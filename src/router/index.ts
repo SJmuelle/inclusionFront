@@ -19,9 +19,9 @@ const routes = [
     component: () => import('../layouts/AdminLayout.vue'),
     children: [
       {
-        path: 'perfil',
-        name: 'perfil',
-        component: () => import('../views/perfil/formPerfil.vue'),
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('../views/dashboard/dashboard.vue'),
         meta: { requireAuth: true },
       },
       {
@@ -37,7 +37,7 @@ const routes = [
         meta: { requireAuth: true },
       },
       {
-        path: 'piarForm/:id',
+        path: 'piarForm/:tipo/:id',
         name: 'piarForm',
         component: () => import('../views/piar/PiarForm.vue'),
         meta: { requireAuth: true },
@@ -70,7 +70,7 @@ const routes = [
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: { name: 'perfil' }
+    redirect: { name: 'dashboard' }
   }
 ];
 

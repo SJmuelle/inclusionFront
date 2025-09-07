@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import { fetchMenu } from '@/services/menuService';
+// import { fetchMenu } from '@/services/menuService';
 import type { MenuItem } from '@/interfaces/menuTypes';
 
 const state = ref('');
@@ -18,14 +18,14 @@ const state = ref('');
 const links = ref<MenuItem[]>([]);
 
 const loadAll = async () => {
-    try {
-        const menuData = await fetchMenu();
-        console.log(menuData)
-        links.value = menuData;
-    } catch (error) {
-        console.error('Error loading menu:', error);
-        links.value = [];
-    }
+    // try {
+    //     const menuData = await fetchMenu();
+    //     console.log(menuData)
+    //     links.value = menuData;
+    // } catch (error) {
+    //     console.error('Error loading menu:', error);
+    //     links.value = [];
+    // }
 };
 
 let timeout: ReturnType<typeof setTimeout>;

@@ -39,19 +39,19 @@
             <!-- Content -->
             <div class="z-10 relative w-full max-w-2xl">
                 <div class="text-6xl font-bold leading-none text-gray-100">
-                    <div>Sistema de Inclusión</div>
+                    <div>Sistema Integrado Educación Inclusiva</div>
                 </div>
                 <div class="mt-6 text-2xl tracking-tight leading-6 text-gray-400">
                     La diversidad nos permite ver lo importante, valioso y único que encontramos en las diferencias. 
                     Aquí diseñamos un sistema que reconoce la diversidad, integra sus necesidades y fortalece sus potencialidades.
                 </div>
-                <div class="mt-8 flex flex-0 items-center -space-x-1.5 "><img src="/src/assets/logoAlcaldia.jpg"
+                <!-- <div class="mt-8 flex flex-0 items-center -space-x-1.5 "><img src="/src/assets/logoAlcaldia.jpg"
                         class="h-10 rounded-full flex-0 router object-cover ring-4 ring-gray-800 ring-offset-1 ring-offset-gray-800 ">
                     <div class="ml-10 pl-3 font-medium tracking-tight text-gray-400 ng-tns-c210218206-60"> ALCALDIA DE
                          </div>
                     <div class="ml-10 pl-3 font-extrabold text-2xl tracking-tight text-gray-400 ng-tns-c210218206-60"> 
                         BARRANQUILLA </div>
-                </div>
+                </div> -->
             </div>
 
         </div>

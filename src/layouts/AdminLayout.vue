@@ -28,7 +28,7 @@
             </div>
 
 
-            <div class="grid grid-cols-2 sm:order-2  ">
+            <div class="flex justify-between sm:order-2   ">
 
               <FullScreen></FullScreen>
 

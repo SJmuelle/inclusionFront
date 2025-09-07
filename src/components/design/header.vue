@@ -77,13 +77,13 @@
         <el-dropdown :hide-on-click="false">
           <span class="el-dropdown-link flex items-center cursor-pointer">
             <img class="w-10 h-10 rounded-full border-2 border-gray-200" src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" alt="Avatar" />
-            <span class="ml-2 text-gray-900 font-semibold">{{ user?.nombres.split(' ')[0] }}</span>
+            <span class="ml-2 text-gray-900 font-semibold">{{ user?.nombre.split(' ')[0] }}</span>
           </span>
           <template #dropdown>
             <el-dropdown-menu class="divide-y divide-gray-100 shadow border border-blue-200">
               <el-dropdown-item disabled class="px-4 py-3 text-sm text-blue-800">
-                <div>Hola, {{ user?.nombres.split(' ')[0] }}</div>
-                <div>{{ user?.company }}</div>
+                <div>Hola, {{ user?.nombre.split(' ')[0] }}</div>
+             
               </el-dropdown-item>
               <el-dropdown-item @click="signOut" class="block px-4 py-2 text-sm hover:bg-blue-50 text-blue-700">Cerrar sesión</el-dropdown-item>
             </el-dropdown-menu>

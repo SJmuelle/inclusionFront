@@ -66,17 +66,8 @@ export class AuthService {
 
 
     static getUserInfo(): userToken | null {
-        const dscTk = this.getToken();
-        if (dscTk !== null) {
-            const decompressedTk = LZString.decompressFromEncodedURIComponent(dscTk);
-            if (decompressedTk) {
-
-                return JSON.parse(decompressedTk);
-
-            }
-        }
-
-        return null
+        const data = localStorage.getItem("usuario")
+        return data ? JSON.parse(data) : null
 
     }
 

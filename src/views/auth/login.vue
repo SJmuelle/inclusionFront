@@ -2,7 +2,7 @@
   <div class="min-h-screen flex items-center justify-center">
     <div class="w-full p-8 flex flex-col items-center">
       <div class="mb-6 flex flex-col items-center">
-         <!-- <img src="/src/assets/alcaldiaBarranquilla.png" alt="Logo" class="w-16 h-16 rounded-full mb-2" /> -->
+         <img src="/src/assets/alcaldiaBarranquilla.svg" alt="Logo" class="mb-2" />
         <p class="text-gray-500 text-xl">Bienvenido, inicia sesión para continuar</p>
       </div>
       <el-form ref="loginForm" class="w-full" label-position="top" :model="form" :rules="rules" @submit.prevent="handleSubmit">
@@ -64,7 +64,7 @@ const handleSubmit = async () => {
         if (response.token) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('usuario', JSON.stringify(response.usuario));
-            router.push('/admin');
+            router.push('/dashboard');
         } else {
             error.value = response.message;
             if (response.type == 2) {

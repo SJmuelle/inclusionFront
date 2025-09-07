@@ -1,6 +1,6 @@
 <template>
   <button data-collapse-toggle="navbar-search" type="button" @click="toggleFullScreen"
-    class="inline-flex items-center p-2 mx-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg  hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-gray-200  "
+    class="inline-flex items-center p-2 mx-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg  hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-gray-200  "
     aria-controls="navbar-search" aria-expanded="false">
     <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -27,4 +27,4 @@ const toggleFullScreen = () => {
     });
   }
 }
-</script>r
+</script>

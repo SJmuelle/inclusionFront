@@ -7,7 +7,7 @@
     <div class="flex items-center px-6 ">
       <img src="@/assets/logoBlanco.svg" alt="Logo" class="w-16" />
       <div>
-        <span class="logo-text ">Sistema PIAR</span>
+        <span class="logo-text ">Sistema Integrado Educación Inclusiva</span>
       </div>
 
     </div>
@@ -18,7 +18,7 @@
         <el-icon>
           <Document />
         </el-icon>
-        <span class="custom-menu-title">Dashboard</span>
+        <span class="custom-menu-title">Home</span>
       </router-link>
     </el-menu-item>
 
