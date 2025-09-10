@@ -623,7 +623,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </el-button>
-          <el-button text class="hover:bg-blue-500" @click="paso = paso == 4 ? paso : paso + 1">
+          <el-button text class="hover:bg-blue-500" @click="paso = paso == 3 ? paso : paso + 1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="#79BBFF" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-8 text-blue-700 hover:bg-blue-700 hover:text-white rounded-full p-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
