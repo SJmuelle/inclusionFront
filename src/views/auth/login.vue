@@ -64,7 +64,7 @@ const handleSubmit = async () => {
         if (response.token) {
           localStorage.setItem('token', response.token);
           localStorage.setItem('usuario', JSON.stringify(response.usuario));
-            router.push('/dashboard');
+            router.push('/admin/dashboard');
         } else {
             error.value = response.message;
             if (response.type == 2) {

@@ -6,6 +6,13 @@
 import {  RouterView } from 'vue-router'
 </script>
 
-<style scoped>
+<style >
+.ql-toolbar.ql-snow{
+  width: 100% !important;
+}
+
+.ql-container.ql-snow {
+    width: 100% !important;
+}
 
 </style>
