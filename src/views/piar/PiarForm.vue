@@ -1235,7 +1235,7 @@ const agregarBarrera = (areaId:number | string) => {
   if (form.barreraSeleccionada && form.tipoSeleccionado) {
     const barreraNombre = barrerasOptions.value.find(b => b.id === form.barreraSeleccionada)?.nombre;
     const tipoNombre = tiposOptions.value.find(t => t.id === form.tipoSeleccionado)?.nombre;
-    let dt:Barrera={ barrera: barreraNombre, tipo: tipoNombre }
+    let dt:Barrera={ "barrera": barreraNombre?barreraNombre:'', "tipo": tipoNombre?tipoNombre:'' }
     form.barreras.push(dt);
     form.barreraSeleccionada = null;
     form.tipoSeleccionado = null;
