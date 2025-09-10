@@ -422,46 +422,85 @@
                 <el-table-column prop="nombre_area" label="Nombre Área" />
               </el-table>
               <div class="flex justify-end mt-4">
-                <el-button type="primary" @click="paso = 2" :disabled="!asignaturasSeleccionadas.length">
-                  Siguiente
+                <el-button type="primary" @click="paso = 2; prepararPaso2" :disabled="!asignaturasSeleccionadas.length">
+                  Guardar avance
                 </el-button>
               </div>
             </div>
           </div>
 
           <!-- PASO 2 -->
-          <div class="w-full h-full relative" v-if="paso === 2">
+          <div class="w-full h-full relative" v-if="paso == 2">
             <div class="p-4 space-y-6">
               <el-tabs v-model="tabActivo" type="card">
                 <el-tab-pane v-for="a in asignaturasSeleccionadas" :key="a.area_id" :label="a.nombre_area"
                   :name="a.area_id">
-                  <!-- Barreras y Tipo -->
+                  <!-- Fila de selects encadenados -->
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                    <el-form-item label="Escoger Barreras" class="w-full">
-                      <el-select v-model="formularios[a.area_id].barreraSeleccionada" placeholder="Buscar..." filterable
-                        clearable>
-                        <el-option v-for="b in barrerasOptions" :key="b.id" :label="b.nombre" :value="b.id" />
+                    <!-- Categoría de barrera (simple) -->
+                    <el-form-item label="Categoría de barrera" class="w-full">
+                      <el-select v-model="formularios[a.area_id].categoriaId" placeholder="Seleccione categoría"
+                        filterable clearable @change="(val:any) => onChangeCategoria(a.area_id, val)">
+                        <el-option v-for="c in categoriasBarreras" :key="c.id" :label="c.nombre" :value="c.id" />
                       </el-select>
                     </el-form-item>
 
-                    <el-form-item label="Escoger Tipo" class="w-full">
-                      <el-select v-model="formularios[a.area_id].tipoSeleccionado" placeholder="Buscar..." filterable
-                        clearable>
-                        <el-option v-for="t in tiposOptions" :key="t.id" :label="t.nombre" :value="t.id" />
+                    <!-- Subcategorías (MULTI) -->
+                    <el-form-item label="Subcategorías" class="w-full">
+                      <el-select v-model="formularios[a.area_id].subcategoriaIds" placeholder="Seleccione subcategorías"
+                        :disabled="!formularios[a.area_id].categoriaId" multiple collapse-tags filterable clearable>
+                        <el-option v-for="sc in formularios[a.area_id].subcategoriasOptions" :key="sc.id"
+                          :label="sc.nombre" :value="sc.id" />
+                      </el-select>
+                    </el-form-item>
+
+                    <!-- Tipo de ajuste (simple) -->
+                    <el-form-item label="Tipo de ajuste" class="w-full">
+                      <el-select v-model="formularios[a.area_id].tipoAjusteId" placeholder="Seleccione tipo" filterable clearable @change="(val:any) => onChangeTipoAjuste(a.area_id, val)">
+                        <el-option v-for="t in tiposAjustes" :key="t.id" :label="t.nombre" :value="t.id" > </el-option>
+                      </el-select>
+                    </el-form-item>
+
+                    <!-- Subtipos (MULTI) -->
+                    <el-form-item label="Subtipos" class="w-full">
+                      <el-select v-model="formularios[a.area_id].subtipoAjusteIds" placeholder="Seleccione subtipos"
+                        :disabled="!formularios[a.area_id].tipoAjusteId" multiple collapse-tags filterable clearable>
+                        <el-option v-for="st in formularios[a.area_id].subtiposOptions" :key="st.id" :label="st.nombre"
+                          :value="st.id" />
+                      </el-select>
+                    </el-form-item>
+
+                    <!-- Apoyo requerido (simple) -->
+                    <el-form-item label="Apoyo requerido" class="w-full">
+                      <el-select v-model="formularios[a.area_id].apoyoId" placeholder="Seleccione apoyo" filterable
+                        clearable @change="(val:any) => onChangeApoyo(a.area_id, val)">
+                        <el-option v-for="ap in apoyosRequeridos" :key="ap.id" :label="ap.nombre" :value="ap.id" />
+                      </el-select>
+                    </el-form-item>
+
+                    <!-- Subapoyos (MULTI) -->
+                    <el-form-item label="Subapoyos" class="w-full">
+                      <el-select v-model="formularios[a.area_id].subapoyoIds" placeholder="Seleccione subapoyos"
+                        :disabled="!formularios[a.area_id].apoyoId" multiple collapse-tags filterable clearable>
+                        <el-option v-for="sap in formularios[a.area_id].subapoyosOptions" :key="sap.id"
+                          :label="sap.nombre" :value="sap.id" />
                       </el-select>
                     </el-form-item>
 
                     <div class="mb-4">
-                      <el-button type="primary" @click="agregarBarrera(a.area_id)">Agregar</el-button>
+                      <el-button type="primary" @click="agregarBarrera(a.area_id)">
+                        Agregar
+                      </el-button>
                     </div>
                   </div>
 
-                  <!-- Tabla barreras -->
+                  <!-- Tabla de barreras agregadas -->
                   <el-table :data="formularios[a.area_id].barreras" border style="width: 100%">
                     <el-table-column label="Acciones" width="100">
                       <template #default="scope">
-                        <el-button type="danger" size="small"
-                          @click="eliminarBarrera(a.area_id, scope.$index)">Eliminar</el-button>
+                        <el-button type="danger" size="small" @click="eliminarBarrera(a.area_id, scope.$index)">
+                          Eliminar
+                        </el-button>
                       </template>
                     </el-table-column>
                     <el-table-column prop="barrera" label="Barrera" />
@@ -491,6 +530,8 @@
               </el-tabs>
             </div>
           </div>
+
+
 
           <div class="w-full h-full relative" v-if="paso == 3">
             <div class="w-full max-w-[900px] mx-auto font-sans text-[13px] leading-snug text-slate-800">
@@ -623,7 +664,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </el-button>
-          <el-button text class="hover:bg-blue-500" @click="paso = paso == 3 ? paso : paso + 1">
+          <el-button text class="hover:bg-blue-500" @click="paso = paso == 3 ? paso : paso + 1; paso==2?prepararPaso2():''">
             <svg xmlns="http://www.w3.org/2000/svg" fill="#79BBFF" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-8 text-blue-700 hover:bg-blue-700 hover:text-white rounded-full p-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -700,21 +741,79 @@ interface Asignatura {
 
 // Arreglo reactivo de asignaturas seleccionadas
 const asignaturasSeleccionadas = ref<Asignatura[]>([])
-const tabActivo = ref(null);
-interface Barrera {
+const tabActivo = ref<number | string>(0);
+// ===== Tipos =====
+interface OpcionBasica {
+  id: number;
+  nombre: string;
+}
+
+interface BarreraFila {
   barrera: string;
   tipo: string;
 }
 
 interface FormularioAsignatura {
+  // padres (simple)
+  categoriaId: number | null;
+  tipoAjusteId: number | null;
+  apoyoId: number | null;
+
+  // hijos (MULTI)
+  subcategoriaIds: number[];     // <= multi
+  subtipoAjusteIds: number[];    // <= multi
+  subapoyoIds: number[];         // <= multi
+
+  // opciones dependientes por tab
+  subcategoriasOptions: OpcionBasica[];
+  subtiposOptions: OpcionBasica[];
+  subapoyosOptions: OpcionBasica[];
+
+  // lo que ya usabas
   barreraSeleccionada: number | null;
   tipoSeleccionado: number | null;
-  barreras: Barrera[];
+  barreras: BarreraFila[];
   apoyoDocente: boolean;
   apoyoAcudiente: boolean;
   seguimiento: string;
 }
-const formularios: Record<string, FormularioAsignatura> = reactive({});
+
+// ===== Estado NUEVO/ajustado =====
+const categoriasBarreras = ref<OpcionBasica[]>([]);
+const tiposAjustes = ref<OpcionBasica[]>([]);
+const apoyosRequeridos = ref<OpcionBasica[]>([]);
+
+// Por asignatura:
+const formularios: Record<string | number, FormularioAsignatura> = reactive({});
+
+// Factory
+const crearFormularioAsignatura = (): FormularioAsignatura => ({
+  // padres
+  categoriaId: null,
+  tipoAjusteId: null,
+  apoyoId: null,
+
+  // hijos multi
+  subcategoriaIds: [],
+  subtipoAjusteIds: [],
+  subapoyoIds: [],
+
+  // opciones dependientes
+  subcategoriasOptions: [],
+  subtiposOptions: [],
+  subapoyosOptions: [],
+
+  // existentes
+  barreraSeleccionada: null,
+  tipoSeleccionado: null,
+  barreras: [],
+  apoyoDocente: false,
+  apoyoAcudiente: false,
+  seguimiento: ""
+});
+
+
+
 const router = useRouter();
 
 const activities: ActivityType[] = [
@@ -1192,7 +1291,7 @@ const gradoSeleccionado = ref(null)
 const areas = ref([])
 
 const cargarAreas = async () => {
-  debugger
+
   if (!gradoSeleccionado.value) {
     areas.value = []
     return
@@ -1215,6 +1314,55 @@ const cargarAreas = async () => {
   }
 }
 
+const cargarBarrera = async (asignatura: any) => {
+
+  if (asignatura) {
+    barrerasOptions.value = []
+    return
+  }
+
+  // Prepara los parámetros para el SP
+  const parametros = {
+    spName: 'fn_listar_categorias_barreras',
+    params: [asignatura] // el SP recibe el ID del grado
+  }
+
+  try {
+    const result = await GeneralService.ejecutarSP('fn_listar_categorias_barreras', parametros)
+    // Según tu backend, el resultado suele venir en la primera posición del arreglo
+    barrerasOptions.value = result?.[0]?.fn_listar_categorias_barreras ?? []
+    console.log(areas.value);
+  } catch (err) {
+    console.error('Error ejecutando el SP:', err)
+    barrerasOptions.value = []
+  }
+}
+
+const cargarSubCategoria = async (barrera: any) => {
+  let subcategoria;
+  if (barrera) {
+    subcategoria = []
+    return
+  }
+
+  // Prepara los parámetros para el SP
+  const parametros = {
+    spName: 'fn_listar_subcategorias_por_categoria',
+    params: [barrera] // el SP recibe el ID del grado
+  }
+
+  try {
+    const result = await GeneralService.ejecutarSP('fn_listar_subcategorias_por_categoria', parametros)
+    // Según tu backend, el resultado suele venir en la primera posición del arreglo
+    subcategoria = result?.[0]?.fn_listar_subcategorias_por_categoria ?? []
+    console.log(areas.value);
+  } catch (err) {
+    console.error('Error ejecutando el SP:', err)
+    areas.value = []
+  }
+}
+
+
 const saveAndExit = async () => {
   await saveDraft();
   toggleDrawer();
@@ -1229,41 +1377,149 @@ const toggleDrawer = () => {
   drawerOpen.value = !drawerOpen.value;
 };
 
-// Agrega una barrera al formulario de la asignatura activa
-const agregarBarrera = (areaId:number | string) => {
-  const form = formularios[areaId];
-  if (form.barreraSeleccionada && form.tipoSeleccionado) {
-    const barreraNombre = barrerasOptions.value.find(b => b.id === form.barreraSeleccionada)?.nombre;
-    const tipoNombre = tiposOptions.value.find(t => t.id === form.tipoSeleccionado)?.nombre;
-    let dt:Barrera={ "barrera": barreraNombre?barreraNombre:'', "tipo": tipoNombre?tipoNombre:'' }
-    form.barreras.push(dt);
-    form.barreraSeleccionada = null;
-    form.tipoSeleccionado = null;
+
+
+
+// Actualiza asignaturas seleccionadas y crea formularios por cada una
+// Actualiza las asignaturas seleccionadas desde la tabla (type="selection")
+const actualizarAsignaturas = (seleccion: Asignatura[]): void => {
+  // 1) Actualiza el array reactivo con la selección de la tabla
+  asignaturasSeleccionadas.value = seleccion ?? [];
+
+  // 2) Asegura que cada asignatura tenga su formulario creado
+  asignaturasSeleccionadas.value.forEach((a) => {
+    if (!formularios[a.area_id]) {
+      formularios[a.area_id] = crearFormularioAsignatura();
+    }
+  });
+
+  // 3) Mantener el tab activo:
+  //    - Si no hay selección, limpiar tab
+  //    - Si el tab activo ya no está en la selección, moverlo al primero
+  if (!asignaturasSeleccionadas.value.length) {
+    tabActivo.value = 0;
+  } else {
+    const sigueActivo = asignaturasSeleccionadas.value.some(s => s.area_id === tabActivo.value);
+    if (!sigueActivo) {
+      tabActivo.value = asignaturasSeleccionadas.value[0].area_id;
+    }
+  }
+
+  // 4) (Opcional) Limpiar formularios de asignaturas que fueron deseleccionadas
+  //    Descomenta si quieres borrar el estado al deseleccionar.
+  /*
+  const idsSeleccionados = new Set(asignaturasSeleccionadas.value.map(s => s.area_id));
+  Object.keys(formularios).forEach((key) => {
+    const k = isNaN(Number(key)) ? key : Number(key);
+    if (!idsSeleccionados.has(k)) {
+      delete formularios[k as keyof typeof formularios];
+    }
+  });
+  */
+};
+
+
+// Helper genérico para SP
+const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]> => {
+  const parametros = { spName, params };
+  try {
+    const result = await GeneralService.ejecutarSP(spName, parametros);
+    // Estructura esperada: result?.[0]?.[spName] === array
+    return (result?.[0]?.[spName] ?? []) as T[];
+  } catch (err) {
+    console.error(`Error ejecutando ${spName}:`, err);
+    return [];
   }
 };
 
-// Elimina una barrera por índice del formulario de la asignatura activa
-const eliminarBarrera = (areaId:number | string, index:number) => {
-  formularios[areaId].barreras.splice(index, 1);
+// Cargas maestras (al entrar a Paso 2)
+const cargarCategoriasBarreras = async (): Promise<void> => {
+  categoriasBarreras.value = await callSP<OpcionBasica>('fn_listar_categorias_barreras');
 };
 
-// Actualiza asignaturas seleccionadas y crea formularios por cada una
-const actualizarAsignaturas = (seleccion:any) => {
-  asignaturasSeleccionadas.value = seleccion;
-  seleccion.forEach((a:Asignatura) => {
-    if (!formularios[a.area_id]) {
-      formularios[a.area_id] = {
-        barreraSeleccionada: null,
-        tipoSeleccionado: null,
-        barreras: [],
-        apoyoDocente: false,
-        apoyoAcudiente: false,
-        seguimiento: ""
-      };
-    }
-  });
-  if (seleccion.length) tabActivo.value = seleccion[0].area_id;
+const cargarTiposAjustes = async (): Promise<void> => {
+  tiposAjustes.value = await callSP<OpcionBasica>('fn_listar_tipos_ajustes');
 };
+
+const cargarApoyosRequeridos = async (): Promise<void> => {
+  apoyosRequeridos.value = await callSP<OpcionBasica>('fn_listar_apoyos_requeridos');
+};
+
+const prepararPaso2 = async (): Promise<void> => {
+  debugger
+  await Promise.all([
+    cargarCategoriasBarreras(),
+    cargarTiposAjustes(),
+    cargarApoyosRequeridos()
+  ]);
+};
+
+// ===== Dependientes por asignatura (padre simple -> hijo MULTI) =====
+
+const onChangeCategoria = async (areaId: string | number, categoriaId: number | null): Promise<void> => {
+  const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
+  form.categoriaId = categoriaId;
+
+  // reset de sus hijos (MULTI)
+  form.subcategoriaIds = [];
+  form.subcategoriasOptions = [];
+
+  if (!categoriaId) return;
+
+  // carga subcategorías por categoría
+  form.subcategoriasOptions = await callSP<OpcionBasica>('fn_listar_subcategorias_por_categoria', [categoriaId]);
+};
+
+const onChangeTipoAjuste = async (areaId: string | number, tipoId: number | null): Promise<void> => {
+  const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
+  form.tipoAjusteId = tipoId;
+
+  // reset de sus hijos (MULTI)
+  form.subtipoAjusteIds = [];
+  form.subtiposOptions = [];
+
+  if (!tipoId) return;
+
+  // carga subtipos por tipo
+  form.subtiposOptions = await callSP<OpcionBasica>('fn_listar_subtipos_por_tipo', [tipoId]);
+};
+
+const onChangeApoyo = async (areaId: string | number, apoyoId: number | null): Promise<void> => {
+  const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
+  form.apoyoId = apoyoId;
+
+  // reset de sus hijos (MULTI)
+  form.subapoyoIds = [];
+  form.subapoyosOptions = [];
+
+  if (!apoyoId) return;
+
+  // carga subapoyos por apoyo
+  form.subapoyosOptions = await callSP<OpcionBasica>('fn_listar_subapoyos_por_apoyo', [apoyoId]);
+};
+
+// ===== Tabla "barreras" (si la mantienes) =====
+
+const agregarBarrera = (areaId: string | number): void => {
+  const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
+
+  const categoriaNombre = categoriasBarreras.value.find(x => x.id === form.categoriaId)?.nombre ?? '';
+  const tipoNombre = tiposAjustes.value.find(x => x.id === form.tipoAjusteId)?.nombre ?? '';
+
+  if (!categoriaNombre || !tipoNombre) return;
+
+  form.barreras.push({
+    barrera: categoriaNombre,
+    tipo: tipoNombre
+  });
+};
+
+const eliminarBarrera = (areaId: string | number, index: number): void => {
+  const form = formularios[areaId];
+  if (!form) return;
+  form.barreras.splice(index, 1);
+};
+
 </script>
 
 <style scoped>
