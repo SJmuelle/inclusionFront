@@ -421,11 +421,7 @@
                 <el-table-column prop="area_id" label="ID Área" width="100" />
                 <el-table-column prop="nombre_area" label="Nombre Área" />
               </el-table>
-              <div class="flex justify-end mt-4">
-                <el-button type="primary" @click="paso = 2; prepararPaso2" :disabled="!asignaturasSeleccionadas.length">
-                  Guardar avance
-                </el-button>
-              </div>
+             
             </div>
           </div>
 
@@ -436,17 +432,17 @@
                 <el-tab-pane v-for="a in asignaturasSeleccionadas" :key="a.area_id" :label="a.nombre_area"
                   :name="a.area_id">
                   <!-- Fila de selects encadenados -->
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                     <!-- Categoría de barrera (simple) -->
-                    <el-form-item label="Categoría de barrera" class="w-full">
+                    <el-form-item label-position="top" label="Categoría de barrera" class="w-full">
                       <el-select v-model="formularios[a.area_id].categoriaId" placeholder="Seleccione categoría"
-                        filterable clearable @change="(val:any) => onChangeCategoria(a.area_id, val)">
+                        filterable clearable @change="(val: any) => onChangeCategoria(a.area_id, val)">
                         <el-option v-for="c in categoriasBarreras" :key="c.id" :label="c.nombre" :value="c.id" />
                       </el-select>
                     </el-form-item>
 
                     <!-- Subcategorías (MULTI) -->
-                    <el-form-item label="Subcategorías" class="w-full">
+                    <el-form-item label-position="top" label="Subcategorías" class="w-full">
                       <el-select v-model="formularios[a.area_id].subcategoriaIds" placeholder="Seleccione subcategorías"
                         :disabled="!formularios[a.area_id].categoriaId" multiple collapse-tags filterable clearable>
                         <el-option v-for="sc in formularios[a.area_id].subcategoriasOptions" :key="sc.id"
@@ -455,14 +451,15 @@
                     </el-form-item>
 
                     <!-- Tipo de ajuste (simple) -->
-                    <el-form-item label="Tipo de ajuste" class="w-full">
-                      <el-select v-model="formularios[a.area_id].tipoAjusteId" placeholder="Seleccione tipo" filterable clearable @change="(val:any) => onChangeTipoAjuste(a.area_id, val)">
-                        <el-option v-for="t in tiposAjustes" :key="t.id" :label="t.nombre" :value="t.id" > </el-option>
+                    <el-form-item label-position="top" label="Tipo de ajuste" class="w-full">
+                      <el-select v-model="formularios[a.area_id].tipoAjusteId" placeholder="Seleccione tipo" filterable
+                        clearable @change="(val: any) => onChangeTipoAjuste(a.area_id, val)">
+                        <el-option v-for="t in tiposAjustes" :key="t.id" :label="t.nombre" :value="t.id"> </el-option>
                       </el-select>
                     </el-form-item>
 
                     <!-- Subtipos (MULTI) -->
-                    <el-form-item label="Subtipos" class="w-full">
+                    <el-form-item label-position="top" label="Subtipos" class="w-full">
                       <el-select v-model="formularios[a.area_id].subtipoAjusteIds" placeholder="Seleccione subtipos"
                         :disabled="!formularios[a.area_id].tipoAjusteId" multiple collapse-tags filterable clearable>
                         <el-option v-for="st in formularios[a.area_id].subtiposOptions" :key="st.id" :label="st.nombre"
@@ -471,15 +468,15 @@
                     </el-form-item>
 
                     <!-- Apoyo requerido (simple) -->
-                    <el-form-item label="Apoyo requerido" class="w-full">
+                    <el-form-item label-position="top" label="Apoyo requerido" class="w-full">
                       <el-select v-model="formularios[a.area_id].apoyoId" placeholder="Seleccione apoyo" filterable
-                        clearable @change="(val:any) => onChangeApoyo(a.area_id, val)">
+                        clearable @change="(val: any) => onChangeApoyo(a.area_id, val)">
                         <el-option v-for="ap in apoyosRequeridos" :key="ap.id" :label="ap.nombre" :value="ap.id" />
                       </el-select>
                     </el-form-item>
 
                     <!-- Subapoyos (MULTI) -->
-                    <el-form-item label="Subapoyos" class="w-full">
+                    <el-form-item label-position="top" label="Subapoyos" class="w-full">
                       <el-select v-model="formularios[a.area_id].subapoyoIds" placeholder="Seleccione subapoyos"
                         :disabled="!formularios[a.area_id].apoyoId" multiple collapse-tags filterable clearable>
                         <el-option v-for="sap in formularios[a.area_id].subapoyosOptions" :key="sap.id"
@@ -507,19 +504,7 @@
                     <el-table-column prop="tipo" label="Tipo" />
                   </el-table>
 
-                  <!-- Apoyo -->
-                  <div class="space-y-4 mt-4">
-                    <h3 class="font-semibold text-sky-900">Apoyo</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <el-form-item label="Docente">
-                        <el-switch v-model="formularios[a.area_id].apoyoDocente" active-text="Sí" inactive-text="No" />
-                      </el-form-item>
-                      <el-form-item label="Acudiente">
-                        <el-switch v-model="formularios[a.area_id].apoyoAcudiente" active-text="Sí"
-                          inactive-text="No" />
-                      </el-form-item>
-                    </div>
-                  </div>
+                 
 
                   <!-- Seguimiento -->
                   <div class="space-y-2 mt-4">
@@ -664,7 +649,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </el-button>
-          <el-button text class="hover:bg-blue-500" @click="paso = paso == 3 ? paso : paso + 1; paso==2?prepararPaso2():''">
+          <el-button text class="hover:bg-blue-500"
+            @click="paso = paso == 3 ? paso : paso + 1; paso == 2 ? prepararPaso2() : ''">
             <svg xmlns="http://www.w3.org/2000/svg" fill="#79BBFF" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-8 text-blue-700 hover:bg-blue-700 hover:text-white rounded-full p-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -1391,8 +1377,7 @@ const actualizarAsignaturas = (seleccion: Asignatura[]): void => {
     if (!formularios[a.area_id]) {
       formularios[a.area_id] = crearFormularioAsignatura();
     }
-  });
-
+  })
   // 3) Mantener el tab activo:
   //    - Si no hay selección, limpiar tab
   //    - Si el tab activo ya no está en la selección, moverlo al primero
@@ -1434,7 +1419,22 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
 
 // Cargas maestras (al entrar a Paso 2)
 const cargarCategoriasBarreras = async (): Promise<void> => {
-  categoriasBarreras.value = await callSP<OpcionBasica>('fn_listar_categorias_barreras');
+   // Prepara los parámetros para el SP
+   
+  const parametros = {
+    spName: 'fn_listar_categorias_barreras',
+    params: [],
+  }
+
+  try {
+    const result = await GeneralService.ejecutarSP('fn_listar_categorias_barreras', parametros)
+    // Según tu backend, el resultado suele venir en la primera posición del arreglo
+    categoriasBarreras.value = result?.[0]?.fn_listar_categorias_barreras ?? []
+    console.log(areas.value);
+  } catch (err) {
+    console.error('Error ejecutando el SP:', err)
+    categoriasBarreras.value = []
+  }
 };
 
 const cargarTiposAjustes = async (): Promise<void> => {
@@ -1445,13 +1445,9 @@ const cargarApoyosRequeridos = async (): Promise<void> => {
   apoyosRequeridos.value = await callSP<OpcionBasica>('fn_listar_apoyos_requeridos');
 };
 
-const prepararPaso2 = async (): Promise<void> => {
+const prepararPaso2 =async  () => {
   debugger
-  await Promise.all([
-    cargarCategoriasBarreras(),
-    cargarTiposAjustes(),
-    cargarApoyosRequeridos()
-  ]);
+    cargarCategoriasBarreras();
 };
 
 // ===== Dependientes por asignatura (padre simple -> hijo MULTI) =====
