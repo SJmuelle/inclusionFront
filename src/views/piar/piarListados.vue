@@ -48,7 +48,7 @@
 
                 </div>
 
-                <div class="col-span-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="col-span-10 grid grid-cols-1 md:grid-cols-2 gap-4">
 
 
                     <el-card v-for="(item, index) in colegios.slice(primerColegio, ultimoColegio)" :key="index"
@@ -187,6 +187,7 @@ const encabezado = ref([
     { label: 'Apellido', prop: 'apellidos' },
     { label: 'Institución Educativa', prop: 'colegio_nombre', width: 300 },
     { label: 'Estado', prop: 'estado_piar', mascara: "estado",width: 110 },
+    { label: 'Detalle', prop: 'detalle '},
     { label: 'Porcentaje', prop: 'avance_piar', mascara: "barra", width: 150 }
 ]);
 const nombre = "Listado de PIAR";
@@ -226,13 +227,14 @@ onMounted(async () => {
 
 
 const seleccion = (item: any) => {
+    localStorage.setItem("colegio", item.colegio_nombre)
     router.push('piarForm/' + item.tipo_documento+'/'+ item.numero_identificacion);
 }
 
 const carruselPrimerColegios = () => {
     ultimoColegio.value = colegios.value.length;
-    if (colegios.value.length > 3) {
-        ultimoColegio.value = 3;
+    if (colegios.value.length > 2) {
+        ultimoColegio.value = 2;
         primerColegio.value = 0;
     } else {
         ultimoColegio.value = colegios.value.length;
@@ -241,12 +243,12 @@ const carruselPrimerColegios = () => {
 }
 
 const carruselDerechaColegios = () => {
-    if (ultimoColegio.value + 3 < colegios.value.length) {
+    if (ultimoColegio.value + 2 < colegios.value.length) {
         primerColegio.value = ultimoColegio.value;
-        ultimoColegio.value += 3;
+        ultimoColegio.value += 2;
     } else {
         ultimoColegio.value = colegios.value.length;
-        primerColegio.value = colegios.value.length - 3;
+        primerColegio.value = colegios.value.length - 2;
     }
 }
 

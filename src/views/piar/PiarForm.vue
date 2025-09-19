@@ -87,10 +87,20 @@
                   <el-form-item label="No. identificación">
                     <el-input v-model="form.infoGeneral.numeroIdentificacion" />
                   </el-form-item>
-
-                  <el-form-item label="Lugar de nacimiento">
-                    <el-input v-model="form.infoGeneral.lugarNacimiento" />
+                  <el-form-item label="País de nacimiento">
+                    <el-select v-model="form.infoGeneral.paisId" placeholder="Seleccione" filterable clearable>
+                      <el-option v-for="p in paisesOptions" :key="p.pais_id" :label="p.nombre" :value="p.pais_id" />
+                    </el-select>
                   </el-form-item>
+
+                  <el-form-item label="Lugar  de nacimiento">
+                    <el-select v-model="form.infoGeneral.lugarNacimiento" :disabled="!form.infoGeneral.paisId"
+                      placeholder="Seleccione" filterable clearable>
+                      <el-option v-for="d in departamentosOptions" :key="d.departamento_id" :label="d.nombre"
+                        :value="d.nombre" />
+                    </el-select>
+                  </el-form-item>
+
                   <el-form-item label="Fecha de nacimiento">
                     <el-date-picker v-model="form.infoGeneral.fechaNacimiento" type="date" format="DD/MM/YYYY"
                       value-format="YYYY-MM-DD" class="w-full" />
@@ -108,11 +118,7 @@
                   </el-form-item>
 
                   <!-- ====== SELECTS EN CASCADA: PAÍS → DEPARTAMENTO → MUNICIPIO ====== -->
-                  <el-form-item label="País">
-                    <el-select v-model="form.infoGeneral.paisId" placeholder="Seleccione" filterable clearable>
-                      <el-option v-for="p in paisesOptions" :key="p.pais_id" :label="p.nombre" :value="p.pais_id" />
-                    </el-select>
-                  </el-form-item>
+
 
                   <el-form-item label="Departamento">
                     <el-select v-model="form.infoGeneral.departamentoId" :disabled="!form.infoGeneral.paisId"
@@ -408,12 +414,22 @@
           <!-- PASO 1 -->
           <div class="w-full h-full relative" v-if="paso === 1">
             <div class="p-4 space-y-6 bg-white">
-              <el-form-item label="Seleccione el grado" class="w-full md:w-1/2">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <el-form-item label="Seleccione el grado" >
                 <el-select v-model="gradoSeleccionado" placeholder="Seleccione" filterable clearable class="w-full"
                   @change="cargarAreas">
                   <el-option v-for="g in areasOptions" :key="g.grado_id" :label="g.nombre_grado" :value="g.grado_id" />
                 </el-select>
               </el-form-item>
+              <el-form-item label="Seleccione el perido" >
+                <el-select v-model="gradoSeleccionado" placeholder="Seleccione" filterable clearable class="w-full"
+                  @change="cargarAreas">
+                  <el-option v-for="g in areasOptions" :key="g.grado_id" :label="g.nombre_grado" :value="g.grado_id" />
+                </el-select>
+              </el-form-item>
+
+              </div>
+             
 
               <el-table :data="areas" border style="width:100%" class="rounded-lg shadow"
                 empty-text="No hay datos disponibles" @selection-change="actualizarAsignaturas">
@@ -421,7 +437,7 @@
                 <el-table-column prop="area_id" label="ID Área" width="100" />
                 <el-table-column prop="nombre_area" label="Nombre Área" />
               </el-table>
-             
+
             </div>
           </div>
 
@@ -432,21 +448,27 @@
                 <el-tab-pane v-for="a in asignaturasSeleccionadas" :key="a.area_id" :label="a.nombre_area"
                   :name="a.area_id">
                   <!-- Fila de selects encadenados -->
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                     <!-- Categoría de barrera (simple) -->
                     <el-form-item label-position="top" label="Categoría de barrera" class="w-full">
                       <el-select v-model="formularios[a.area_id].categoriaId" placeholder="Seleccione categoría"
                         filterable clearable @change="(val: any) => onChangeCategoria(a.area_id, val)">
-                        <el-option v-for="c in categoriasBarreras" :key="c.id" :label="c.nombre" :value="c.id" />
+                        <el-option v-for="c in categoriasBarreras" :key="c.categoria_id" :label="c.nombre"
+                          :value="c.categoria_id" />
                       </el-select>
                     </el-form-item>
 
+                    <el-form-item label-position="top" label="Categoría de barrera" class="w-full md:col-span-2">
+                      <el-input disabled v-model="formularios[a.area_id].descripcionCategoria" style="width: 100%"
+                        :rows="2" type="textarea" placeholder="" />
+                    </el-form-item>
+
                     <!-- Subcategorías (MULTI) -->
-                    <el-form-item label-position="top" label="Subcategorías" class="w-full">
+                    <el-form-item label-position="top" label="Subcategorías" class="w-full md:col-span-3">
                       <el-select v-model="formularios[a.area_id].subcategoriaIds" placeholder="Seleccione subcategorías"
                         :disabled="!formularios[a.area_id].categoriaId" multiple collapse-tags filterable clearable>
-                        <el-option v-for="sc in formularios[a.area_id].subcategoriasOptions" :key="sc.id"
-                          :label="sc.nombre" :value="sc.id" />
+                        <el-option v-for="sc in formularios[a.area_id].subcategoriasOptions" :key="sc.subcategoria_id"
+                          :label="sc.descripcion" :value="sc.subcategoria_id" />
                       </el-select>
                     </el-form-item>
 
@@ -454,16 +476,18 @@
                     <el-form-item label-position="top" label="Tipo de ajuste" class="w-full">
                       <el-select v-model="formularios[a.area_id].tipoAjusteId" placeholder="Seleccione tipo" filterable
                         clearable @change="(val: any) => onChangeTipoAjuste(a.area_id, val)">
-                        <el-option v-for="t in tiposAjustes" :key="t.id" :label="t.nombre" :value="t.id"> </el-option>
+                        <el-option v-for="t in tiposAjustes" :key="t.tipo_ajuste_id" :label="t.nombre"
+                          :value="t.tipo_ajuste_id">
+                        </el-option>
                       </el-select>
                     </el-form-item>
 
                     <!-- Subtipos (MULTI) -->
-                    <el-form-item label-position="top" label="Subtipos" class="w-full">
+                    <el-form-item label-position="top" label="Subtipos" class="w-full col-span-2">
                       <el-select v-model="formularios[a.area_id].subtipoAjusteIds" placeholder="Seleccione subtipos"
                         :disabled="!formularios[a.area_id].tipoAjusteId" multiple collapse-tags filterable clearable>
-                        <el-option v-for="st in formularios[a.area_id].subtiposOptions" :key="st.id" :label="st.nombre"
-                          :value="st.id" />
+                        <el-option v-for="st in formularios[a.area_id].subtiposOptions" :key="st.subtipo_ajuste_id"
+                          :label="st.nombre" :value="st.subtipo_ajuste_id" />
                       </el-select>
                     </el-form-item>
 
@@ -471,16 +495,22 @@
                     <el-form-item label-position="top" label="Apoyo requerido" class="w-full">
                       <el-select v-model="formularios[a.area_id].apoyoId" placeholder="Seleccione apoyo" filterable
                         clearable @change="(val: any) => onChangeApoyo(a.area_id, val)">
-                        <el-option v-for="ap in apoyosRequeridos" :key="ap.id" :label="ap.nombre" :value="ap.id" />
+                        <el-option v-for="ap in apoyosRequeridos" :key="ap.apoyo_id" :label="ap.nombre"
+                          :value="ap.apoyo_id" />
                       </el-select>
                     </el-form-item>
 
+                    <el-form-item label-position="top" label="Apoyo requerido" class="w-full md:col-span-2">
+                      <el-input disabled v-model="formularios[a.area_id].apoyoRequeridoDescripcion" style="width: 100%"
+                        :rows="2" type="textarea" placeholder="" />
+                    </el-form-item>
+
                     <!-- Subapoyos (MULTI) -->
-                    <el-form-item label-position="top" label="Subapoyos" class="w-full">
+                    <el-form-item label-position="top" label="Subapoyos" class="w-full md:col-span-3">
                       <el-select v-model="formularios[a.area_id].subapoyoIds" placeholder="Seleccione subapoyos"
                         :disabled="!formularios[a.area_id].apoyoId" multiple collapse-tags filterable clearable>
-                        <el-option v-for="sap in formularios[a.area_id].subapoyosOptions" :key="sap.id"
-                          :label="sap.nombre" :value="sap.id" />
+                        <el-option v-for="sap in formularios[a.area_id].subapoyosOptions" :key="sap.subapoyo_id"
+                          :label="sap.descripcion" :value="sap.subapoyo_id" />
                       </el-select>
                     </el-form-item>
 
@@ -504,7 +534,7 @@
                     <el-table-column prop="tipo" label="Tipo" />
                   </el-table>
 
-                 
+
 
                   <!-- Seguimiento -->
                   <div class="space-y-2 mt-4">
@@ -734,6 +764,45 @@ interface OpcionBasica {
   nombre: string;
 }
 
+interface OpcionCategoria {
+  categoria_id: number;
+  nombre: string;
+  descripcion: string
+}
+
+interface OpcionSubCategoria {
+  categoria_id: number;
+  nombre: string;
+  descripcion: string;
+  subcategoria_id: number;
+}
+
+interface OpcionTipo {
+  tipo_ajuste_id: number;
+  nombre: string;
+}
+
+interface OpcionSubTipo {
+  tipo_ajuste_id: number;
+  nombre: string;
+  subtipo_ajuste_id: number;
+  tipo_ajuste_nombre: string;
+}
+
+interface OpcionApoyoRequerido {
+  apoyo_id: number;
+  descripcion: string;
+  nombre: string;
+}
+interface OpcionSubApoyo {
+  apoyo_id: number;
+  descripcion: string;
+  nombre: string;
+  apoyo_nombre: string;
+  subapoyo_id: number;
+}
+
+
 interface BarreraFila {
   barrera: string;
   tipo: string;
@@ -751,9 +820,12 @@ interface FormularioAsignatura {
   subapoyoIds: number[];         // <= multi
 
   // opciones dependientes por tab
-  subcategoriasOptions: OpcionBasica[];
-  subtiposOptions: OpcionBasica[];
-  subapoyosOptions: OpcionBasica[];
+  subcategoriasOptions: OpcionSubCategoria[];
+  subtiposOptions: OpcionSubTipo[];
+  subapoyosOptions: OpcionSubApoyo[];
+
+  descripcionCategoria: string,
+  apoyoRequeridoDescripcion: string,
 
   // lo que ya usabas
   barreraSeleccionada: number | null;
@@ -765,15 +837,15 @@ interface FormularioAsignatura {
 }
 
 // ===== Estado NUEVO/ajustado =====
-const categoriasBarreras = ref<OpcionBasica[]>([]);
-const tiposAjustes = ref<OpcionBasica[]>([]);
-const apoyosRequeridos = ref<OpcionBasica[]>([]);
+const categoriasBarreras = ref<OpcionCategoria[]>([]);
+const tiposAjustes = ref<OpcionTipo[]>([]);
+const apoyosRequeridos = ref<OpcionApoyoRequerido[]>([]);
 
 // Por asignatura:
 const formularios: Record<string | number, FormularioAsignatura> = reactive({});
 
 // Factory
-const crearFormularioAsignatura = (): FormularioAsignatura => ({
+const crearFormularioAsignatura = (): any => ({
   // padres
   categoriaId: null,
   tipoAjusteId: null,
@@ -845,10 +917,7 @@ const drawerMode = ref<"side" | "over">("side");
 const activeNames = ref<string | number>("infoGeneral");
 
 const data = ref<any>({});
-const barrerasOptions = ref([
-  { id: 1, nombre: "Motivacionales" },
-  { id: 2, nombre: "Académicas" },
-]);
+const barrerasOptions = ref<OpcionCategoria[]>([]);
 
 const tiposOptions = ref([
   { id: 1, nombre: "Temporal" },
@@ -1254,6 +1323,11 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
+
+  acta.institucion = localStorage.getItem("colegio")
+  const usuarioStr = localStorage.getItem("usuario");
+  const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
+  acta.personaDiligencia = usuario?.nombre ?? "";
 });
 
 /** ===== Guardar (borrador) ===== */
@@ -1300,53 +1374,7 @@ const cargarAreas = async () => {
   }
 }
 
-const cargarBarrera = async (asignatura: any) => {
 
-  if (asignatura) {
-    barrerasOptions.value = []
-    return
-  }
-
-  // Prepara los parámetros para el SP
-  const parametros = {
-    spName: 'fn_listar_categorias_barreras',
-    params: [asignatura] // el SP recibe el ID del grado
-  }
-
-  try {
-    const result = await GeneralService.ejecutarSP('fn_listar_categorias_barreras', parametros)
-    // Según tu backend, el resultado suele venir en la primera posición del arreglo
-    barrerasOptions.value = result?.[0]?.fn_listar_categorias_barreras ?? []
-    console.log(areas.value);
-  } catch (err) {
-    console.error('Error ejecutando el SP:', err)
-    barrerasOptions.value = []
-  }
-}
-
-const cargarSubCategoria = async (barrera: any) => {
-  let subcategoria;
-  if (barrera) {
-    subcategoria = []
-    return
-  }
-
-  // Prepara los parámetros para el SP
-  const parametros = {
-    spName: 'fn_listar_subcategorias_por_categoria',
-    params: [barrera] // el SP recibe el ID del grado
-  }
-
-  try {
-    const result = await GeneralService.ejecutarSP('fn_listar_subcategorias_por_categoria', parametros)
-    // Según tu backend, el resultado suele venir en la primera posición del arreglo
-    subcategoria = result?.[0]?.fn_listar_subcategorias_por_categoria ?? []
-    console.log(areas.value);
-  } catch (err) {
-    console.error('Error ejecutando el SP:', err)
-    areas.value = []
-  }
-}
 
 
 const saveAndExit = async () => {
@@ -1405,6 +1433,7 @@ const actualizarAsignaturas = (seleccion: Asignatura[]): void => {
 
 
 // Helper genérico para SP
+// Helper genérico para SP
 const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]> => {
   const parametros = { spName, params };
   try {
@@ -1419,43 +1448,31 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
 
 // Cargas maestras (al entrar a Paso 2)
 const cargarCategoriasBarreras = async (): Promise<void> => {
-   // Prepara los parámetros para el SP
-   
-  const parametros = {
-    spName: 'fn_listar_categorias_barreras',
-    params: [],
-  }
-
-  try {
-    const result = await GeneralService.ejecutarSP('fn_listar_categorias_barreras', parametros)
-    // Según tu backend, el resultado suele venir en la primera posición del arreglo
-    categoriasBarreras.value = result?.[0]?.fn_listar_categorias_barreras ?? []
-    console.log(areas.value);
-  } catch (err) {
-    console.error('Error ejecutando el SP:', err)
-    categoriasBarreras.value = []
-  }
+  categoriasBarreras.value = await callSP<OpcionCategoria>('fn_listar_categorias_barreras');
 };
 
 const cargarTiposAjustes = async (): Promise<void> => {
-  tiposAjustes.value = await callSP<OpcionBasica>('fn_listar_tipos_ajustes');
+  tiposAjustes.value = await callSP<OpcionTipo>('fn_listar_tipos_ajustes');
 };
 
 const cargarApoyosRequeridos = async (): Promise<void> => {
-  apoyosRequeridos.value = await callSP<OpcionBasica>('fn_listar_apoyos_requeridos');
+  apoyosRequeridos.value = await callSP<OpcionApoyoRequerido>('fn_listar_apoyos_requeridos');
 };
 
-const prepararPaso2 =async  () => {
-  debugger
-    cargarCategoriasBarreras();
+const prepararPaso2 = async (): Promise<void> => {
+  await Promise.all([
+    cargarCategoriasBarreras(),
+    cargarTiposAjustes(),
+    cargarApoyosRequeridos()
+  ]);
 };
-
 // ===== Dependientes por asignatura (padre simple -> hijo MULTI) =====
 
 const onChangeCategoria = async (areaId: string | number, categoriaId: number | null): Promise<void> => {
   const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
   form.categoriaId = categoriaId;
-
+  const categoria = categoriasBarreras.value.find(c => c.categoria_id === categoriaId);
+  formularios[areaId].descripcionCategoria = categoria ? categoria.descripcion : "Seleccione una barrera";
   // reset de sus hijos (MULTI)
   form.subcategoriaIds = [];
   form.subcategoriasOptions = [];
@@ -1463,7 +1480,7 @@ const onChangeCategoria = async (areaId: string | number, categoriaId: number | 
   if (!categoriaId) return;
 
   // carga subcategorías por categoría
-  form.subcategoriasOptions = await callSP<OpcionBasica>('fn_listar_subcategorias_por_categoria', [categoriaId]);
+  form.subcategoriasOptions = await callSP<OpcionSubCategoria>('fn_listar_subcategorias_por_categoria', [categoriaId]);
 };
 
 const onChangeTipoAjuste = async (areaId: string | number, tipoId: number | null): Promise<void> => {
@@ -1477,13 +1494,14 @@ const onChangeTipoAjuste = async (areaId: string | number, tipoId: number | null
   if (!tipoId) return;
 
   // carga subtipos por tipo
-  form.subtiposOptions = await callSP<OpcionBasica>('fn_listar_subtipos_por_tipo', [tipoId]);
+  form.subtiposOptions = await callSP<OpcionSubTipo>('fn_listar_subtipos_por_tipo', [tipoId]);
 };
 
 const onChangeApoyo = async (areaId: string | number, apoyoId: number | null): Promise<void> => {
   const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
   form.apoyoId = apoyoId;
-
+  const apoyo = apoyosRequeridos.value.find(c => c.apoyo_id === apoyoId);
+  formularios[areaId].apoyoRequeridoDescripcion = apoyo ? apoyo.descripcion : "Seleccione una barrera";
   // reset de sus hijos (MULTI)
   form.subapoyoIds = [];
   form.subapoyosOptions = [];
@@ -1491,7 +1509,7 @@ const onChangeApoyo = async (areaId: string | number, apoyoId: number | null): P
   if (!apoyoId) return;
 
   // carga subapoyos por apoyo
-  form.subapoyosOptions = await callSP<OpcionBasica>('fn_listar_subapoyos_por_apoyo', [apoyoId]);
+  form.subapoyosOptions = await callSP<OpcionSubApoyo>('fn_listar_subapoyos_por_apoyo', [apoyoId]);
 };
 
 // ===== Tabla "barreras" (si la mantienes) =====
@@ -1499,8 +1517,8 @@ const onChangeApoyo = async (areaId: string | number, apoyoId: number | null): P
 const agregarBarrera = (areaId: string | number): void => {
   const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
 
-  const categoriaNombre = categoriasBarreras.value.find(x => x.id === form.categoriaId)?.nombre ?? '';
-  const tipoNombre = tiposAjustes.value.find(x => x.id === form.tipoAjusteId)?.nombre ?? '';
+  const categoriaNombre = categoriasBarreras.value.find(x => x.categoria_id === form.categoriaId)?.nombre ?? '';
+  const tipoNombre = tiposAjustes.value.find(x => x.tipo_ajuste_id === form.tipoAjusteId)?.nombre ?? '';
 
   if (!categoriaNombre || !tipoNombre) return;
 
@@ -1508,6 +1526,8 @@ const agregarBarrera = (areaId: string | number): void => {
     barrera: categoriaNombre,
     tipo: tipoNombre
   });
+
+
 };
 
 const eliminarBarrera = (areaId: string | number, index: number): void => {

@@ -19,54 +19,8 @@
 
   <div class="mx-auto p-4">
     <!-- ======= RESUMEN POR COLEGIO (3 columnas, sin carrusel) ======= -->
-    <!-- CARD: Resumen Colegios -->
-    <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
-      <!-- Icono -->
-      <div class="p-3 rounded-lg bg-indigo-50">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-          class="w-7 h-7 text-indigo-600">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18M6 7.5v9m12-9v9" />
-        </svg>
-      </div>
 
-      <!-- Centro: título, total y barra -->
-      <div class="flex-1 min-w-0">
-        <div class="text-sm text-gray-500">Colegios</div>
-        <div class="text-2xl font-semibold text-gray-800 truncate">
-          {{ totalColegios }}
-        </div>
-
-        <!-- Progress: % terminados -->
-        <div class="mt-2 h-2 w-full bg-indigo-100 rounded-full overflow-hidden">
-          <div class="h-2 rounded-full bg-indigo-500 transition-all"
-            :style="{ width: percentTerminados.toFixed(0) + '%' }"></div>
-        </div>
-      </div>
-
-      <!-- Derecha: porcentajes -->
-      <div class="text-right space-y-1">
-        <div class="text-xs text-gray-500">Terminados</div>
-        <div class="flex items-center justify-end gap-1">
-          <span class="text-sm font-semibold text-emerald-600">
-            {{ percentTerminados.toFixed(1) }}%
-          </span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-            class="w-4 h-4 text-emerald-600">
-            <path d="M10 3l5 6H5l5-6z" />
-          </svg>
-        </div>
-
-        <div class="text-xs text-gray-500 mt-1">Pendientes</div>
-        <div class="flex items-center justify-end gap-1">
-          <span class="text-sm font-semibold text-rose-600">
-            {{ percentPendientes.toFixed(1) }}%
-          </span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-rose-600">
-            <path d="M10 17l-5-6h10l-5 6z" />
-          </svg>
-        </div>
-      </div>
-    </div>
+  
 
 
     <div class="flex justify-between items-center mb-4">
@@ -83,7 +37,7 @@
 
 
 
-    <div class="grid grid-cols-10  gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-10  gap-4">
       <!-- <div class="div">
           <el-card shadow="hover"
             class="rounded-lg cursor-pointer border-emerald-700 bg-gradient-to-r from-emerald-50 to-emerald-300"
@@ -123,7 +77,7 @@
         </div> -->
 
 
-      <div class="md:col-span-8  ">
+      <div class="md:col-span-10  ">
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <el-card v-for="(c, idx) in colegios" :key="idx" shadow="hover" class="rounded-lg cursor-pointer" :class="`border-2 ${colegioSeleccionado === c.colegio_id ? 'border-purple-700' : 'border-transparent'} 
                    bg-gradient-to-r from-${colorKey(idx)}-50 to-${colorKey(idx)}-300`" @click="filtroColegio(c)">
@@ -168,10 +122,7 @@
 
       </div>
 
-      <div class="md:col-span-2">
-
-        <calendario></calendario>
-      </div>
+   
     </div>
 
 
