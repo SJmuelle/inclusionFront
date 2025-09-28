@@ -53,8 +53,8 @@
       <div class="flex justify-between items-center border-b bg-blue-50 ">
         <div class="p-4 rounded-xl border bg-white m-4 w-full shadow-lg h-[78vh] overflow-auto">
           <div class="flex items-center justify-between mb-3">
-            <h2 class="text-xl font-semibold text-sky-900">PIAR — Paso {{ paso + 1 }}</h2>
-            <el-tag type="info" effect="plain">Estudiante: {{ form.infoGeneral.nombres || '-' }}</el-tag>
+            <h2 class="text-xl font-semibold text-sky-900"> {{ activities[paso].content }}</h2>
+            <el-tag type="info" effect="plain">Estudiante: {{ form.infoGeneral.nombres || '-' }} {{ form.infoGeneral.apellidos || '-' }}</el-tag>
           </div>
 
 
@@ -69,15 +69,15 @@
               <el-form :model="form.infoGeneral" label-position="top" :disabled="loading">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <el-form-item label="Nombres">
-                    <el-input v-model="form.infoGeneral.nombres" />
+                    <el-input v-model="form.infoGeneral.nombres"  :disabled="true"/>
                   </el-form-item>
-                  <el-form-item label="Apellidos">
-                    <el-input v-model="form.infoGeneral.apellidos" />
+                  <el-form-item label="Apellidos" >
+                    <el-input v-model="form.infoGeneral.apellidos"  :disabled="true"/>
                   </el-form-item>
 
-                  <el-form-item label="Tipo identificación">
+                  <el-form-item label="Tipo identificación" >
                     <el-select v-model="form.infoGeneral.tipoIdentificacion" placeholder="Seleccione" filterable
-                      clearable>
+                      clearable :disabled="true">
                       <el-option label="CC" value="CC" />
                       <el-option label="TI" value="TI" />
                       <el-option label="RC" value="RC" />
@@ -85,7 +85,7 @@
                     </el-select>
                   </el-form-item>
                   <el-form-item label="No. identificación">
-                    <el-input v-model="form.infoGeneral.numeroIdentificacion" />
+                    <el-input v-model="form.infoGeneral.numeroIdentificacion" :disabled="true" />
                   </el-form-item>
                   <el-form-item label="País de nacimiento">
                     <el-select v-model="form.infoGeneral.paisId" placeholder="Seleccione" filterable clearable>
@@ -109,17 +109,15 @@
                   <el-form-item label="Edad (años)">
                     <el-input v-model="form.infoGeneral.edad" type="number" />
                   </el-form-item>
-                  <el-form-item label="Grado actual o al que ingresa">
+                  <el-form-item label="Grado actual o al que ingresa" class="md:col-span-2">
                     <el-input v-model="form.infoGeneral.grado" placeholder="p.ej., CICLO 22" />
                   </el-form-item>
 
-                  <el-form-item label="Vinculado al sistema educativo (año anterior)">
+                  <el-form-item label="Vinculado al sistema educativo (año anterior)" class="md:col-span-2">
                     <el-switch v-model="form.infoGeneral.vinculadoSistemaEducativo" />
                   </el-form-item>
 
                   <!-- ====== SELECTS EN CASCADA: PAÍS → DEPARTAMENTO → MUNICIPIO ====== -->
-
-
                   <el-form-item label="Departamento">
                     <el-select v-model="form.infoGeneral.departamentoId" :disabled="!form.infoGeneral.paisId"
                       placeholder="Seleccione" filterable clearable>
@@ -136,7 +134,7 @@
                     </el-select>
                   </el-form-item>
 
-                  <el-form-item label="Barrio / Vereda">
+                  <el-form-item label="Barrio / Vereda" class="md:col-span-2">
                     <el-input v-model="form.infoGeneral.barrio" />
                   </el-form-item>
 
@@ -221,7 +219,7 @@
               </template>
 
               <el-form :model="form.salud" label-position="top" :disabled="loading">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <el-form-item label="Afiliación al sistema de salud">
                     <el-switch v-model="form.salud.afiliado" />
                   </el-form-item>
@@ -298,40 +296,69 @@
               </template>
 
               <el-form :model="form.hogar" label-position="top" :disabled="loading">
+
+                <div class="relative mb-2">
+                  <div
+                    class="-translate-x-1/2 top-1 absolute bg-white border border-pink-700 flex flex-col justify-center left-10 p-1 rounded">
+                    <img src="/src/assets/mama.png" alt="Logo" class=" w-10 h-10 rounded-full" />
+                    <span class="text-pink-700 font-semibold">Madre</span>
+                  </div>
+                  <div
+                    class="div ml-10 pl-10 card border-l-4 border border-pink-700 rounded-lg shadow bg-pink-100 grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <el-form-item label="Nombre" class=" font-semibold">
+                      <el-input v-model="form.hogar.madreNombre" />
+                    </el-form-item>
+                    <el-form-item label="Ocupación ">
+                      <el-input v-model="form.hogar.ocupacionMadre" />
+                    </el-form-item>
+                    <el-form-item label="Nivel educativo ">
+                      <el-select v-model="form.hogar.nivelMadre" placeholder="Seleccione" filterable clearable>
+                        <el-option label="Primaria" value="Primaria" />
+                        <el-option label="Bachillerato" value="Bachillerato" />
+                        <el-option label="Técnico" value="Técnico" />
+                        <el-option label="Tecnólogo" value="Tecnólogo" />
+                        <el-option label="Universitario" value="Universitario" />
+                      </el-select>
+                    </el-form-item>
+                    <el-form-item label="Fallecido">
+                      <el-switch v-model="form.hogar.fallecioMadre" active-text="Sí" inactive-text="No" />
+                    </el-form-item>
+                  </div>
+                </div>
+                <div class="relative mb-2">
+                  <div
+                    class="-translate-x-1/2 top-1 absolute bg-white border border-blue-700 flex flex-col justify-center left-10 p-1 rounded">
+                    <img src="/src/assets/papa.png" alt="Logo" class=" w-10 h-10 rounded-full" />
+                    <span class="text-blue-700 font-semibold">Padre</span>
+                  </div>
+                  <div
+                    class="div ml-10 pl-10 card border-l-4 border border-blue-700 rounded-lg shadow bg-blue-100 grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <el-form-item label="Nombre  " class=" font-semibold">
+                      <el-input v-model="form.hogar.padreNombre" />
+                    </el-form-item>
+
+                    <el-form-item label="Ocupación ">
+                      <el-input v-model="form.hogar.ocupacionPadre" />
+                    </el-form-item>
+
+                    <el-form-item label="Nivel educativo">
+                      <el-select v-model="form.hogar.nivelPadre" placeholder="Seleccione" filterable clearable>
+                        <el-option label="Primaria" value="Primaria" />
+                        <el-option label="Bachillerato" value="Bachillerato" />
+                        <el-option label="Técnico" value="Técnico" />
+                        <el-option label="Tecnólogo" value="Tecnólogo" />
+                        <el-option label="Universitario" value="Universitario" />
+                      </el-select>
+                    </el-form-item>
+
+                    <el-form-item label="Fallecido">
+                      <el-switch v-model="form.hogar.fallecioPadre" active-text="Sí" inactive-text="No" />
+                    </el-form-item>
+                  </div>
+                </div>
+
+                
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <el-form-item label="Nombre de la madre">
-                    <el-input v-model="form.hogar.madreNombre" />
-                  </el-form-item>
-                  <el-form-item label="Nombre del padre">
-                    <el-input v-model="form.hogar.padreNombre" />
-                  </el-form-item>
-                  <el-form-item label="Ocupación de la madre">
-                    <el-input v-model="form.hogar.ocupacionMadre" />
-                  </el-form-item>
-                  <el-form-item label="Ocupación del padre">
-                    <el-input v-model="form.hogar.ocupacionPadre" />
-                  </el-form-item>
-
-                  <el-form-item label="Nivel educativo de la madre">
-                    <el-select v-model="form.hogar.nivelMadre" placeholder="Seleccione" filterable clearable>
-                      <el-option label="Primaria" value="Primaria" />
-                      <el-option label="Bachillerato" value="Bachillerato" />
-                      <el-option label="Técnico" value="Técnico" />
-                      <el-option label="Tecnólogo" value="Tecnólogo" />
-                      <el-option label="Universitario" value="Universitario" />
-                    </el-select>
-                  </el-form-item>
-
-                  <el-form-item label="Nivel educativo del padre">
-                    <el-select v-model="form.hogar.nivelPadre" placeholder="Seleccione" filterable clearable>
-                      <el-option label="Primaria" value="Primaria" />
-                      <el-option label="Bachillerato" value="Bachillerato" />
-                      <el-option label="Técnico" value="Técnico" />
-                      <el-option label="Tecnólogo" value="Tecnólogo" />
-                      <el-option label="Universitario" value="Universitario" />
-                    </el-select>
-                  </el-form-item>
-
                   <el-form-item label="Nombre del cuidador">
                     <el-input v-model="form.hogar.cuidadorNombre" />
                   </el-form-item>
@@ -396,7 +423,7 @@
                   </el-form-item>
                   <el-form-item v-if="form.educativo.recibeInformePedagogico"
                     label="¿De qué institución o modalidad proviene el informe?" class="md:col-span-2">
-                    <el-input v-model="form.educativo.institucionInforme" />
+                    <el-input v-model="form.educativo.institucionInforme" :disabled="true" />
                   </el-form-item>
 
                   <el-form-item label="¿Está asistiendo actualmente a programas complementarios?">
@@ -414,24 +441,20 @@
           <!-- PASO 1 -->
           <div class="w-full h-full relative" v-if="paso === 1">
             <div class="p-4 space-y-6 bg-white">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <el-form-item label="Seleccione el grado" >
-                <el-select v-model="gradoSeleccionado" placeholder="Seleccione" filterable clearable class="w-full"
-                  @change="cargarAreas">
-                  <el-option v-for="g in areasOptions" :key="g.grado_id" :label="g.nombre_grado" :value="g.grado_id" />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="Seleccione el perido" >
-                <el-select v-model="gradoSeleccionado" placeholder="Seleccione" filterable clearable class="w-full"
-                  @change="cargarAreas">
-                  <el-option v-for="g in areasOptions" :key="g.grado_id" :label="g.nombre_grado" :value="g.grado_id" />
-                </el-select>
-              </el-form-item>
+              <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <el-form-item label="Seleccione el grado">
+                  <el-select v-model="gradoSeleccionado" placeholder="Seleccione" filterable clearable class="w-full"
+                    @change="cargarAreas">
+                    <el-option v-for="g in areasOptions" :key="g.grado_id" :label="g.nombre_grado"
+                      :value="g.grado_id" />
+                  </el-select>
+                </el-form-item>
+              
 
-              </div>
-             
+              </div> -->
 
-              <el-table :data="areas" border style="width:100%" class="rounded-lg shadow"
+
+              <el-table :data="areas"  style="width:100%" class="rounded-lg shadow border"
                 empty-text="No hay datos disponibles" @selection-change="actualizarAsignaturas">
                 <el-table-column type="selection" width="55" />
                 <el-table-column prop="area_id" label="ID Área" width="100" />
@@ -450,6 +473,17 @@
                   <!-- Fila de selects encadenados -->
                   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                     <!-- Categoría de barrera (simple) -->
+
+                    <el-form-item label-position="top" label="Escoger Perido" class="w-full md:col-span-3">
+                      <el-select v-model="formularios[a.area_id].periodo" placeholder="Seleccione Peirido de evaluación de la barrera"
+                        filterable clearable >
+                        <el-option  key="1" label="Perido I" value="1" />
+                        <el-option  key="2" label="Perido II" value="2" />
+                        <el-option  key="3" label="Perido III" value="3" />
+                      </el-select>
+                    </el-form-item>
+
+
                     <el-form-item label-position="top" label="Categoría de barrera" class="w-full">
                       <el-select v-model="formularios[a.area_id].categoriaId" placeholder="Seleccione categoría"
                         filterable clearable @change="(val: any) => onChangeCategoria(a.area_id, val)">
@@ -516,7 +550,7 @@
 
                     <div class="mb-4">
                       <el-button type="primary" @click="agregarBarrera(a.area_id)">
-                        Agregar
+                        Agregar barrera
                       </el-button>
                     </div>
                   </div>
@@ -540,6 +574,13 @@
                   <div class="space-y-2 mt-4">
                     <h3 class="font-semibold text-sky-900">Seguimiento</h3>
                     <QuillEditor v-model:content="formularios[a.area_id].seguimiento" contentType="html" />
+                  </div>
+
+                  <!-- boton guardar areas -->
+                  <div class="flex justify-end mt-4">
+                    <el-button type="success"  :loading="saving">
+                      Guardar Asignatura
+                    </el-button>
                   </div>
                 </el-tab-pane>
               </el-tabs>
@@ -809,6 +850,7 @@ interface BarreraFila {
 }
 
 interface FormularioAsignatura {
+  periodo:String | null;
   // padres (simple)
   categoriaId: number | null;
   tipoAjusteId: number | null;
@@ -847,6 +889,8 @@ const formularios: Record<string | number, FormularioAsignatura> = reactive({});
 // Factory
 const crearFormularioAsignatura = (): any => ({
   // padres
+  periodo: null,
+  // padres simples
   categoriaId: null,
   tipoAjusteId: null,
   apoyoId: null,
@@ -1301,6 +1345,7 @@ onMounted(async () => {
       // Preseleccionar IDs según textos
       preseleccionarUbicacionDesdeTexto();
       preseleccionarRegimenDesdeTexto();
+     
     }
   } catch (err) {
     console.error(err);
@@ -1310,6 +1355,15 @@ onMounted(async () => {
   }
   loading.value = true;
   try {
+    const param = { spName: "fn_consultar_grado_estudiante",   params: [tipo, id] };
+    const res = await GeneralService.ejecutarSP("fn_consultar_grado_estudiante", param);
+    const inco = res?.[0]?.fn_consultar_grado_estudiante ?? null;
+    
+    if (inco) {
+      gradoSeleccionado.value = inco;
+       cargarAreas();
+    }
+
     const parametros = { spName: "fn_listar_grados_jsonb", params: [] };
     const result = await GeneralService.ejecutarSP("fn_listar_grados_jsonb", parametros);
     const incoming = result?.[0]?.fn_listar_grados_jsonb ?? null;
@@ -1352,10 +1406,6 @@ const areas = ref([])
 
 const cargarAreas = async () => {
 
-  if (!gradoSeleccionado.value) {
-    areas.value = []
-    return
-  }
 
   // Prepara los parámetros para el SP
   const parametros = {
@@ -1470,6 +1520,7 @@ const prepararPaso2 = async (): Promise<void> => {
 
 const onChangeCategoria = async (areaId: string | number, categoriaId: number | null): Promise<void> => {
   const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
+  form.periodo="1"
   form.categoriaId = categoriaId;
   const categoria = categoriasBarreras.value.find(c => c.categoria_id === categoriaId);
   formularios[areaId].descripcionCategoria = categoria ? categoria.descripcion : "Seleccione una barrera";
