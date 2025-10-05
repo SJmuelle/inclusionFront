@@ -282,14 +282,17 @@
                   <el-form-item v-if="form.salud.consumeMedicamentos" label="Medicamentos (¿Cuáles?)">
                     <el-input v-model="form.salud.medicamentosCuales" />
                   </el-form-item>
-                  <el-form-item v-if="form.salud.consumeMedicamentos" label="Frecuencia y horario">
+                  <el-form-item v-if="form.salud.consumeMedicamentos" label="Frecuencia">
                     <el-input v-model="form.salud.medicamentosFrecuencia" />
+                  </el-form-item>
+                  <el-form-item v-if="form.salud.consumeMedicamentos" label="Horario">
+                    <el-input v-model="form.salud.medicamentosHorarios" />
                   </el-form-item>
 
                   <el-form-item label="¿Apoyos/ayudas técnicas o tecnológicas?">
                     <el-switch v-model="form.salud.apoyosTecnicos" />
                   </el-form-item>
-                  <el-form-item v-if="form.salud.apoyosTecnicos" label="¿Cuáles?" class="md:col-span-2">
+                  <el-form-item v-if="form.salud.apoyosTecnicos" label="¿Cuáles?">
                     <el-input v-model="form.salud.apoyosTecnicosCuales" />
                   </el-form-item>
                 </div>
@@ -447,21 +450,22 @@
 
           <!-- PASO 1 -->
           <div class="w-full h-full relative" v-if="paso === 1">
-            <div class="p-4 space-y-6 bg-white">
-              <!-- <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <el-form-item label="Seleccione el grado">
-                  <el-select v-model="gradoSeleccionado" placeholder="Seleccione" filterable clearable class="w-full"
-                    @change="cargarAreas">
-                    <el-option v-for="g in areasOptions" :key="g.grado_id" :label="g.nombre_grado"
-                      :value="g.grado_id" />
-                  </el-select>
+            <div class="p-4 space-y-6 ">
+              <el-form :model="form2" label-position="top" :disabled="loading" class="bg-white grid md:grid-cols-2">
+                <el-form-item label="¿El estudiante requiere ajuste?">
+                  <el-switch v-model="form2.requiere_ajuste" active-text="Sí" inactive-text="No" />
                 </el-form-item>
-              
 
-              </div> -->
+                <el-form-item v-if="!form2.requiere_ajuste" label="¿Trabaja con DUA?">
+                  <el-switch v-model="form2.trabaja_duba" active-text="Sí" inactive-text="No" />
+                </el-form-item>
 
+                <el-form-item v-if="!form2.requiere_ajuste" label="Descripción" class="md:col-span-2">
+                  <QuillEditor v-model:content="form2.justificacion" t contentType="html" />
+                </el-form-item>
+              </el-form>
 
-              <el-table :data="areas" style="width:100%" class="rounded-lg shadow border"
+              <el-table v-if="form2.requiere_ajuste" :data="areas" style="width:100%" class=" rounded-lg shadow border"
                 empty-text="No hay datos disponibles" @selection-change="actualizarAsignaturas">
                 <el-table-column type="selection" width="55" />
                 <el-table-column prop="area_id" label="ID Área" width="100" />
@@ -474,6 +478,7 @@
           <!-- PASO 2 -->
           <div class="w-full h-full relative" v-if="paso == 2">
             <div class="p-4 space-y-6">
+              <!-- aqui van la cosa esa de perido y luego este formulario -->
               <el-tabs v-model="tabActivo" type="card">
                 <el-tab-pane v-for="a in asignaturasSeleccionadas" :key="a.area_id" :label="a.nombre_area"
                   :name="a.area_id">
@@ -563,7 +568,7 @@
                   </div>
 
                   <!-- Tabla de barreras agregadas -->
-                  <el-table :data="formularios[a.area_id].barreras" border style="width: 100%">
+                  <el-table :data="formularios[a.area_id].barreras" stripe  style="width: 100%">
                     <el-table-column label="Acciones" width="100">
                       <template #default="scope">
                         <el-button type="danger" size="small" @click="eliminarBarrera(a.area_id, scope.$index)">
@@ -968,8 +973,9 @@ const drawerMode = ref<"side" | "over">("side");
 const activeNames = ref<string | number>("infoGeneral");
 
 const data = ref<any>({});
+const idPiar=ref<string>("")
 const barrerasOptions = ref<OpcionCategoria[]>([]);
-
+const idEstudiante = ref<string>("")
 const tiposOptions = ref([
   { id: 1, nombre: "Temporal" },
   { id: 2, nombre: "Permanente" },
@@ -1075,6 +1081,14 @@ const form = reactive<any>({
     seguimiento: "",
   },
 });
+/** ===== FORM PRINCIPAL (Step 2) ===== */
+const form2 = reactive<any>({
+  requiere_ajuste: true,
+  trabaja_duba: true,
+  justificacion: "",
+  areas: [],
+});
+
 
 /** ===== Helpers ===== */
 const calcEdad = (yyyyMmDd?: string) => {
@@ -1232,6 +1246,7 @@ const mapIncomingToForm = (payload: any) => {
   form.salud.consumeMedicamentos = !!meds;
   form.salud.medicamentosCuales = Array.isArray(meds) ? meds.join(", ") : (typeof meds === "string" ? meds : "");
   form.salud.medicamentosFrecuencia = trat.tratamiento_especial?.frecuencia_sesiones ?? "";
+  // form.salud.medicamentosFrecuencia = trat.tratamiento_especial?.frecuencia_sesiones ?? "";
   form.salud.tipoDiscapacidad = trat.tratamiento_especial?.frecuencia_sesiones ?? "";
 
   // ======= familia → hogar =======
@@ -1336,6 +1351,7 @@ onMounted(async () => {
     const incoming = result?.[0]?.fn_consultar_estudiante_por_identificacion ?? null;
     if (incoming) {
       data.value = incoming;
+      idPiar.value=data.value.planes_piar[0].informacion_piar.identificador_piar
       mapIncomingToForm(incoming);
     }
   } catch (err) {
@@ -1346,6 +1362,20 @@ onMounted(async () => {
   }
 
   loading.value = true;
+  try {
+    const parametros = { spName: "fn_obtener_estudiante_id", params: [tipo, id] };
+    const result = await GeneralService.ejecutarSP("fn_obtener_estudiante_id", parametros);
+    const incoming = result?.[0]?.fn_obtener_estudiante_id ?? null;
+    if (incoming) {
+      idEstudiante.value = incoming.estudiante_id;
+
+    }
+  } catch (err) {
+    console.error(err);
+    ElMessage.error("No fue posible cargar los catálogos");
+  } finally {
+    loading.value = false;
+  }
   try {
     const parametros = { spName: "fn_listar_catalogos", params: [] };
     const result = await GeneralService.ejecutarSP("fn_listar_catalogos", parametros);
@@ -1502,7 +1532,23 @@ const cambiarPaso = async () => {
     case 0:
       sp_guardar_estudiante_completos();
       break;
+    case 1:
+      if (form2.requiere_ajuste==true) {
+        //si hay asignatura falta
+        console.log(asignaturasSeleccionadas.value);
+        if(asignaturasSeleccionadas.value.length>0){
+        await prepararPaso2();
 
+        }else{
+           ElMessage.error('Oops, Almenos seleccione una area.')
+        }
+       
+      } else {
+        paso.value = 3
+      }
+
+
+      break;
     default:
       paso.value = paso.value + 1
       break;
@@ -1513,47 +1559,104 @@ const cambiarPaso = async () => {
 const sp_guardar_estudiante_completos = async () => {
   // paso.value=1
   // Mapeamos directamente desde form
-  const mappedArray: string[] = [
-    String(form.infoGeneral.numeroIdentificacion), // p_estudiante_id
-    String(form.infoGeneral.direccion),            // p_direccion
-    String(form.infoGeneral.barrio),               // p_barrio
-    String(form.infoGeneral.telefono),             // p_telefono
-    String(form.infoGeneral.telefono),             // p_celular (si tienes campo específico cámbialo)
-    String(form.infoGeneral.correo),               // p_email
-    String(form.infoGeneral.centroProteccion),     // p_modalidad_proteccion
-    "Defensoría del Pueblo",                       // p_lugar_proteccion (ajusta si existe en form)
-    String(form.infoGeneral.perteneceGrupoEtnico), // p_pertenece_grupo_etnico
-    String(form.descripcion.gustosIntereses),      // p_gustos_e_intereses
-    String(form.salud.afiliado),                   // p_afiliado_sistema
-    String(form.salud.regimenId),                  // p_regimen_id
-    String(form.salud.eps),                        // p_eps
-    String(form.salud.tieneDiagnostico),           // p_tiene_diagnostico
-    String(form.salud.diagnosticoCual),            // p_diagnostico
-    JSON.stringify([
-      { tipo_terapia: form.salud.atencionMedicaCual, frecuencia: form.salud.frecuenciaAtencion }
-    ]),                                            // p_terapias
-    JSON.stringify([
-      { nombre_medicamento: form.salud.medicamentosCuales, frecuencia: form.salud.medicamentosFrecuencia, hora: "08:00" }
-    ]),                                            // p_medicamentos
-    String(form.hogar.madreNombre),                // p_nombre_madre
-    String(form.hogar.ocupacionMadre),             // p_ocupacion_madre
-    String(form.hogar.padreNombre),                // p_nombre_padre
-    String(form.hogar.cuidadorNombre),             // p_nombre_cuidador
-    String(form.hogar.parentesco),                 // p_parentesco_cuidador
-    String(form.educativo.vinculadoOtraInst),      // p_matriculado_otra_institucion
-    String(form.educativo.ultimoGrado),            // p_ultimo_grado_cursado
-    JSON.stringify(form.educativo.institucionesIds)// p_instituciones_ids
-  ];
+  // Array de valores con comentarios
+ const mappedArray = [
+  idEstudiante.value, // p_estudiante_id
+  form.infoGeneral.direccion,            // p_direccion
+  form.infoGeneral.barrio,               // p_barrio
+  form.infoGeneral.telefono,             // p_telefono
+  form.infoGeneral.telefono,             // p_celular (si tienes campo específico, cámbialo)
+  form.infoGeneral.correo,               // p_email
+  form.infoGeneral.centroProteccion,     // p_modalidad_proteccion
+  "Defensoría del Pueblo",               // p_lugar_proteccion (ajusta si lo tienes en form)
+  form.infoGeneral.perteneceGrupoEtnico, // p_pertenece_grupo_etnico
+  form.descripcion.gustosIntereses,      // p_gustos_e_intereses
+  form.salud.afiliado,                   // p_afiliado_sistema
+  form.salud.regimenId,                  // p_regimen_id
+  form.salud.eps,                        // p_eps
+  form.salud.tieneDiagnostico,           // p_tiene_diagnostico
+  form.salud.diagnosticoCual,            // p_diagnostico
+  JSON.stringify([
+    { tipo_terapia: form.salud.atencionMedicaCual, frecuencia: form.salud.frecuenciaAtencion }
+  ]),                                    // p_terapias
+  JSON.stringify([
+    { nombre_medicamento: form.salud.medicamentosCuales, frecuencia: form.salud.medicamentosFrecuencia, hora: "08:00" }
+  ]),                                    // p_medicamentos
+  form.hogar.madreNombre,                // p_nombre_madre
+  form.hogar.ocupacionMadre,             // p_ocupacion_madre
+  form.hogar.padreNombre,                // p_nombre_padre
+  form.hogar.cuidadorNombre,             // p_nombre_cuidador
+  form.hogar.parentesco,                 // p_parentesco_cuidador
+  form.educativo.vinculadoOtraInst,      // p_matriculado_otra_institucion
+  form.educativo.ultimoGrado,            // p_ultimo_grado_cursado
+  form.educativo.institucionesIds        // p_instituciones_ids
+];
   // Mapeamos directamente desde form
-  
+const mappedArrayExtras = [
+  // === IDENTIFICADOR ===
+  idEstudiante.value,          // p_estudiante_id
+
+  // === DATOS ADICIONALES DEL ESTUDIANTE ===
+  form.infoGeneral.registroVictimas,              // p_tiene_registro_victima
+  form.descripcion.expectativasEstudiante,        // p_expectativas_estudiante
+  form.descripcion.expectativasFamilia,           // p_expectativas_familia
+  form.descripcion.redesApoyo.otras,              // p_redes_apoyo
+
+  // === DATOS ADICIONALES DE SALUD ===
+  form.salud.lugarEmergencia,                     // p_lugar_atencion_emergencia
+  form.salud.tieneAtencionMedica,                 // p_tratamiento_especial
+  form.salud.detalleTratamiento,                  // p_tratamiento_detalle
+  form.salud.apoyosTecnicos,                      // p_apoyos_tecnicos
+  form.salud.apoyosTecnicosCuales,                // p_detalle_apoyos
+  JSON.stringify([
+    {
+      tipo_terapia: form.salud.atencionMedicaCual,
+      frecuencia: form.salud.frecuenciaAtencion
+    }
+  ]),                                             // p_terapias
+  JSON.stringify([
+    {
+      nombre_medicamento: form.salud.medicamentosCuales,
+      frecuencia: form.salud.medicamentosFrecuencia,
+      hora: "08:00"
+    }
+  ]),                                             // p_medicamentos
+
+  // === DATOS FAMILIARES ADICIONALES ===
+  form.hogar.nivelMadre,                          // p_nivel_educativo_madre
+  form.hogar.ocupacionPadre,                      // p_ocupacion_padre
+  form.hogar.nivelPadre,                          // p_nivel_educativo_padre
+  form.hogar.cuidadorNivel,                       // p_nivel_educativo_cuidador
+  form.hogar.cuidadorTelefono,                    // p_telefono_cuidador
+  form.hogar.cuidadorCorreo,                      // p_correo_cuidador
+  form.hogar.numHermanos,                         // p_numero_hermanos
+  form.hogar.lugarQueOcupa,                       // p_lugar_entre_hermanos
+  form.hogar.quienesApoyanCrianza,                // p_apoyan_crianza
+  form.hogar.personasConQuienVive,                // p_personas_con_quien_vive
+  form.hogar.fallecioMadre,                                           // p_madre_viva (valor por defecto)
+  form.hogar.fallecioPadre,                                           // p_padre_vivo (valor por defecto)
+
+  // === DATOS EDUCATIVOS ADICIONALES ===
+  form.educativo.otrasInstituciones,              // p_detalle_otras_instituciones
+  null,                                           // p_motivo_cambio (no existe en form)
+  form.educativo.estado,                          // p_estado_ultimo_grado
+  null,                                           // p_observaciones (no existe en form)
+  form.educativo.recibeInformePedagogico,         // p_recibe_informe
+  form.educativo.institucionInforme,              // p_institucion_informe
+  form.educativo.programasComplementarios,        // p_asiste_programas_complementarios
+  form.educativo.cualesProgramas                  // p_detalle_programas
+];
 
   console.log("Objeto mapeado desde form:", mappedArray);
   // console.log("Formulario principal:", form);
   saving.value = true;
   try {
-    const parametros = { spName: "sp_guardar_estudiante_completos", params: mappedArray };
-    GeneralService.ejecutarSP("sp_guardar_estudiante_completos", parametros);
+    const parametros = { spName: "fn_guardar_estudiante_simple", params: mappedArray };
+    GeneralService.ejecutarSP("fn_guardar_estudiante_simple", parametros);
     ElMessage.success("Datos guardados correctamente");
+    const parametros2 = { spName: "fn_guardar_estudiante_complementario", params: mappedArrayExtras };
+    GeneralService.ejecutarSP("fn_guardar_estudiante_complementario", parametros2);
+   
     paso.value = 1;
   } catch (e) {
     console.error(e);
@@ -1578,6 +1681,13 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
 };
 
 // Cargas maestras (al entrar a Paso 2)
+const sp_perido_barrera = async (): Promise<void> => {
+ const parametros2 = { spName: "sp_perido_barrera",  params: [form.informacion_piar.identificador_piar] };
+    GeneralService.ejecutarSP("sp_perido_barrera", parametros2);
+   
+};
+
+// Cargas maestras (al entrar a Paso 2)
 const cargarCategoriasBarreras = async (): Promise<void> => {
   categoriasBarreras.value = await callSP<OpcionCategoria>('fn_listar_categorias_barreras');
 };
@@ -1591,11 +1701,17 @@ const cargarApoyosRequeridos = async (): Promise<void> => {
 };
 
 const prepararPaso2 = async (): Promise<void> => {
-  await Promise.all([
-    cargarCategoriasBarreras(),
-    cargarTiposAjustes(),
-    cargarApoyosRequeridos()
-  ]);
+  try {
+    await Promise.all([
+      cargarCategoriasBarreras(),
+      cargarTiposAjustes(),
+      cargarApoyosRequeridos()
+    ]);
+    paso.value = 2;
+  } catch (error) {
+    console.error('Error cargando datos iniciales:', error);
+   
+  }
 };
 // ===== Dependientes por asignatura (padre simple -> hijo MULTI) =====
 
@@ -1659,6 +1775,7 @@ const agregarBarrera = (areaId: string | number): void => {
     tipo: tipoNombre
   });
 
+  console.log(form)
 
 };
 
