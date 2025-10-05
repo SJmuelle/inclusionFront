@@ -54,7 +54,8 @@
         <div class="p-4 rounded-xl border bg-white m-4 w-full shadow-lg h-[78vh] overflow-auto">
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-xl font-semibold text-sky-900"> {{ activities[paso].content }}</h2>
-            <el-tag type="info" effect="plain">Estudiante: {{ form.infoGeneral.nombres || '-' }} {{ form.infoGeneral.apellidos || '-' }}</el-tag>
+            <el-tag type="info" effect="plain">Estudiante: {{ form.infoGeneral.nombres || '-' }} {{
+              form.infoGeneral.apellidos || '-' }}</el-tag>
           </div>
 
 
@@ -69,13 +70,13 @@
               <el-form :model="form.infoGeneral" label-position="top" :disabled="loading">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <el-form-item label="Nombres">
-                    <el-input v-model="form.infoGeneral.nombres"  :disabled="true"/>
+                    <el-input v-model="form.infoGeneral.nombres" :disabled="true" />
                   </el-form-item>
-                  <el-form-item label="Apellidos" >
-                    <el-input v-model="form.infoGeneral.apellidos"  :disabled="true"/>
+                  <el-form-item label="Apellidos">
+                    <el-input v-model="form.infoGeneral.apellidos" :disabled="true" />
                   </el-form-item>
 
-                  <el-form-item label="Tipo identificación" >
+                  <el-form-item label="Tipo identificación">
                     <el-select v-model="form.infoGeneral.tipoIdentificacion" placeholder="Seleccione" filterable
                       clearable :disabled="true">
                       <el-option label="CC" value="CC" />
@@ -145,7 +146,10 @@
                   <el-form-item label="Teléfono">
                     <el-input v-model="form.infoGeneral.telefono" />
                   </el-form-item>
-                  <el-form-item label="Correo electrónico">
+                  <el-form-item label="Celular">
+                    <el-input v-model="form.infoGeneral.telefono_movil" />
+                  </el-form-item>
+                  <el-form-item label="Correo electrónico" class="md:col-span-2">
                     <el-input v-model="form.infoGeneral.correo" type="email" />
                   </el-form-item>
 
@@ -158,6 +162,9 @@
 
                   <el-form-item label="¿Está en algún Centro de Protección?">
                     <el-switch v-model="form.infoGeneral.centroProteccion" />
+                  </el-form-item>
+                  <el-form-item v-if="form.infoGeneral.centroProteccion" label="Lugar protección" class="md:col-span-2">
+                    <el-input v-model="form.infoGeneral.lugarProteccion" type="text" />
                   </el-form-item>
 
                   <el-form-item label="¿Se reconoce o pertenece a un grupo étnico?">
@@ -357,7 +364,7 @@
                   </div>
                 </div>
 
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <el-form-item label="Nombre del cuidador">
                     <el-input v-model="form.hogar.cuidadorNombre" />
@@ -454,7 +461,7 @@
               </div> -->
 
 
-              <el-table :data="areas"  style="width:100%" class="rounded-lg shadow border"
+              <el-table :data="areas" style="width:100%" class="rounded-lg shadow border"
                 empty-text="No hay datos disponibles" @selection-change="actualizarAsignaturas">
                 <el-table-column type="selection" width="55" />
                 <el-table-column prop="area_id" label="ID Área" width="100" />
@@ -475,11 +482,11 @@
                     <!-- Categoría de barrera (simple) -->
 
                     <el-form-item label-position="top" label="Escoger Perido" class="w-full md:col-span-3">
-                      <el-select v-model="formularios[a.area_id].periodo" placeholder="Seleccione Peirido de evaluación de la barrera"
-                        filterable clearable >
-                        <el-option  key="1" label="Perido I" value="1" />
-                        <el-option  key="2" label="Perido II" value="2" />
-                        <el-option  key="3" label="Perido III" value="3" />
+                      <el-select v-model="formularios[a.area_id].periodo"
+                        placeholder="Seleccione Peirido de evaluación de la barrera" filterable clearable>
+                        <el-option key="1" label="Perido I" value="1" />
+                        <el-option key="2" label="Perido II" value="2" />
+                        <el-option key="3" label="Perido III" value="3" />
                       </el-select>
                     </el-form-item>
 
@@ -578,7 +585,7 @@
 
                   <!-- boton guardar areas -->
                   <div class="flex justify-end mt-4">
-                    <el-button type="success"  :loading="saving">
+                    <el-button type="success" :loading="saving">
                       Guardar Asignatura
                     </el-button>
                   </div>
@@ -720,8 +727,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </el-button>
-          <el-button text class="hover:bg-blue-500"
-            @click="paso = paso == 3 ? paso : paso + 1; paso == 2 ? prepararPaso2() : ''">
+          <el-button text class="hover:bg-blue-500" @click="cambiarPaso()">
             <svg xmlns="http://www.w3.org/2000/svg" fill="#79BBFF" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-8 text-blue-700 hover:bg-blue-700 hover:text-white rounded-full p-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -752,6 +758,7 @@ import { ElMessage } from "element-plus";
 /* Quill */
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
+import { sw } from "element-plus/es/locales.mjs";
 
 const paso = ref<number>(0)
 
@@ -850,7 +857,7 @@ interface BarreraFila {
 }
 
 interface FormularioAsignatura {
-  periodo:String | null;
+  periodo: String | null;
   // padres (simple)
   categoriaId: number | null;
   tipoAjusteId: number | null;
@@ -986,6 +993,7 @@ const form = reactive<any>({
     barrio: "",
     direccion: "",
     telefono: "",
+    telefono_movil: "",
     correo: "",
 
     // IDs seleccionados
@@ -996,6 +1004,7 @@ const form = reactive<any>({
     victimaConflicto: false,
     registroVictimas: false,
     centroProteccion: false,
+    lugarProteccion: "",
     perteneceGrupoEtnico: false,
     grupoEtnicoCual: "",
   },
@@ -1167,7 +1176,8 @@ const mapIncomingToForm = (payload: any) => {
   form.infoGeneral.municipio = ubi.ciudad ?? "";
   form.infoGeneral.barrio = ubi.barrio ?? "";
   form.infoGeneral.direccion = ubi.direccion ?? "";
-  form.infoGeneral.telefono = cont.telefono_movil ?? cont.telefono_fijo ?? "";
+  form.infoGeneral.telefono = cont.telefono_fijo ?? "";
+  form.infoGeneral.telefono_movil = cont.telefono_movil ?? "";
   form.infoGeneral.correo = cont.correo_electronico ?? "";
 
   // situación especial
@@ -1345,7 +1355,7 @@ onMounted(async () => {
       // Preseleccionar IDs según textos
       preseleccionarUbicacionDesdeTexto();
       preseleccionarRegimenDesdeTexto();
-     
+
     }
   } catch (err) {
     console.error(err);
@@ -1355,13 +1365,13 @@ onMounted(async () => {
   }
   loading.value = true;
   try {
-    const param = { spName: "fn_consultar_grado_estudiante",   params: [tipo, id] };
+    const param = { spName: "fn_consultar_grado_estudiante", params: [tipo, id] };
     const res = await GeneralService.ejecutarSP("fn_consultar_grado_estudiante", param);
     const inco = res?.[0]?.fn_consultar_grado_estudiante ?? null;
-    
+
     if (inco) {
       gradoSeleccionado.value = inco;
-       cargarAreas();
+      cargarAreas();
     }
 
     const parametros = { spName: "fn_listar_grados_jsonb", params: [] };
@@ -1481,6 +1491,77 @@ const actualizarAsignaturas = (seleccion: Asignatura[]): void => {
   */
 };
 
+const cambiarPaso = async () => {
+  // let nuevoPaso = paso.value + 1;
+  // if (nuevoPaso === 2 ) {
+  //   // entrando a paso 2
+  //   await prepararPaso2();
+  // }
+  // paso = paso == 3 ? paso : paso + 1; paso == 2 ? prepararPaso2() : ''
+  switch (paso.value) {
+    case 0:
+      sp_guardar_estudiante_completos();
+      break;
+
+    default:
+      paso.value = paso.value + 1
+      break;
+  }
+
+  // paso.value = 1;
+};
+const sp_guardar_estudiante_completos = async () => {
+  // paso.value=1
+  // Mapeamos directamente desde form
+  const mappedArray: string[] = [
+    String(form.infoGeneral.numeroIdentificacion), // p_estudiante_id
+    String(form.infoGeneral.direccion),            // p_direccion
+    String(form.infoGeneral.barrio),               // p_barrio
+    String(form.infoGeneral.telefono),             // p_telefono
+    String(form.infoGeneral.telefono),             // p_celular (si tienes campo específico cámbialo)
+    String(form.infoGeneral.correo),               // p_email
+    String(form.infoGeneral.centroProteccion),     // p_modalidad_proteccion
+    "Defensoría del Pueblo",                       // p_lugar_proteccion (ajusta si existe en form)
+    String(form.infoGeneral.perteneceGrupoEtnico), // p_pertenece_grupo_etnico
+    String(form.descripcion.gustosIntereses),      // p_gustos_e_intereses
+    String(form.salud.afiliado),                   // p_afiliado_sistema
+    String(form.salud.regimenId),                  // p_regimen_id
+    String(form.salud.eps),                        // p_eps
+    String(form.salud.tieneDiagnostico),           // p_tiene_diagnostico
+    String(form.salud.diagnosticoCual),            // p_diagnostico
+    JSON.stringify([
+      { tipo_terapia: form.salud.atencionMedicaCual, frecuencia: form.salud.frecuenciaAtencion }
+    ]),                                            // p_terapias
+    JSON.stringify([
+      { nombre_medicamento: form.salud.medicamentosCuales, frecuencia: form.salud.medicamentosFrecuencia, hora: "08:00" }
+    ]),                                            // p_medicamentos
+    String(form.hogar.madreNombre),                // p_nombre_madre
+    String(form.hogar.ocupacionMadre),             // p_ocupacion_madre
+    String(form.hogar.padreNombre),                // p_nombre_padre
+    String(form.hogar.cuidadorNombre),             // p_nombre_cuidador
+    String(form.hogar.parentesco),                 // p_parentesco_cuidador
+    String(form.educativo.vinculadoOtraInst),      // p_matriculado_otra_institucion
+    String(form.educativo.ultimoGrado),            // p_ultimo_grado_cursado
+    JSON.stringify(form.educativo.institucionesIds)// p_instituciones_ids
+  ];
+  // Mapeamos directamente desde form
+  
+
+  console.log("Objeto mapeado desde form:", mappedArray);
+  // console.log("Formulario principal:", form);
+  saving.value = true;
+  try {
+    const parametros = { spName: "sp_guardar_estudiante_completos", params: mappedArray };
+    GeneralService.ejecutarSP("sp_guardar_estudiante_completos", parametros);
+    ElMessage.success("Datos guardados correctamente");
+    paso.value = 1;
+  } catch (e) {
+    console.error(e);
+    ElMessage.error("Error guardando los datos");
+  } finally {
+    saving.value = false;
+  }
+}
 
 // Helper genérico para SP
 // Helper genérico para SP
@@ -1520,7 +1601,7 @@ const prepararPaso2 = async (): Promise<void> => {
 
 const onChangeCategoria = async (areaId: string | number, categoriaId: number | null): Promise<void> => {
   const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
-  form.periodo="1"
+  form.periodo = "1"
   form.categoriaId = categoriaId;
   const categoria = categoriasBarreras.value.find(c => c.categoria_id === categoriaId);
   formularios[areaId].descripcionCategoria = categoria ? categoria.descripcion : "Seleccione una barrera";
