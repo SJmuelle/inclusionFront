@@ -568,7 +568,7 @@
                   </div>
 
                   <!-- Tabla de barreras agregadas -->
-                  <el-table :data="formularios[a.area_id].barreras" stripe  style="width: 100%">
+                  <el-table :data="formularios[a.area_id].barreras" stripe style="width: 100%">
                     <el-table-column label="Acciones" width="100">
                       <template #default="scope">
                         <el-button type="danger" size="small" @click="eliminarBarrera(a.area_id, scope.$index)">
@@ -973,7 +973,7 @@ const drawerMode = ref<"side" | "over">("side");
 const activeNames = ref<string | number>("infoGeneral");
 
 const data = ref<any>({});
-const idPiar=ref<string>("")
+const idPiar = ref<string>("")
 const barrerasOptions = ref<OpcionCategoria[]>([]);
 const idEstudiante = ref<string>("")
 const tiposOptions = ref([
@@ -1351,8 +1351,22 @@ onMounted(async () => {
     const incoming = result?.[0]?.fn_consultar_estudiante_por_identificacion ?? null;
     if (incoming) {
       data.value = incoming;
-      idPiar.value=data.value.planes_piar[0].informacion_piar.identificador_piar
+      idPiar.value = data.value.planes_piar[0].informacion_piar.identificador_piar
       mapIncomingToForm(incoming);
+      // try {
+      //   const parametros = { spName: "fn_avance_informes", params: [ idPiar.value] };
+      //   const result = await GeneralService.ejecutarSP("fn_avance_informes", parametros);
+      //   const incoming = result?.[0]?.fn_avance_informes ?? null;
+      //   if (incoming) {
+      //   console.log(incoming)
+
+      //   }
+      // } catch (err) {
+      //   console.error(err);
+      //   ElMessage.error("No fue posible cargar los catálogos");
+      // } finally {
+      //   loading.value = false;
+      // }
     }
   } catch (err) {
     console.error(err);
@@ -1533,16 +1547,16 @@ const cambiarPaso = async () => {
       sp_guardar_estudiante_completos();
       break;
     case 1:
-      if (form2.requiere_ajuste==true) {
+      if (form2.requiere_ajuste == true) {
         //si hay asignatura falta
         console.log(asignaturasSeleccionadas.value);
-        if(asignaturasSeleccionadas.value.length>0){
-        await prepararPaso2();
+        if (asignaturasSeleccionadas.value.length > 0) {
+          await prepararPaso2();
 
-        }else{
-           ElMessage.error('Oops, Almenos seleccione una area.')
+        } else {
+          ElMessage.error('Oops, Almenos seleccione una area.')
         }
-       
+
       } else {
         paso.value = 3
       }
@@ -1560,92 +1574,92 @@ const sp_guardar_estudiante_completos = async () => {
   // paso.value=1
   // Mapeamos directamente desde form
   // Array de valores con comentarios
- const mappedArray = [
-  idEstudiante.value, // p_estudiante_id
-  form.infoGeneral.direccion,            // p_direccion
-  form.infoGeneral.barrio,               // p_barrio
-  form.infoGeneral.telefono,             // p_telefono
-  form.infoGeneral.telefono,             // p_celular (si tienes campo específico, cámbialo)
-  form.infoGeneral.correo,               // p_email
-  form.infoGeneral.centroProteccion,     // p_modalidad_proteccion
-  "Defensoría del Pueblo",               // p_lugar_proteccion (ajusta si lo tienes en form)
-  form.infoGeneral.perteneceGrupoEtnico, // p_pertenece_grupo_etnico
-  form.descripcion.gustosIntereses,      // p_gustos_e_intereses
-  form.salud.afiliado,                   // p_afiliado_sistema
-  form.salud.regimenId,                  // p_regimen_id
-  form.salud.eps,                        // p_eps
-  form.salud.tieneDiagnostico,           // p_tiene_diagnostico
-  form.salud.diagnosticoCual,            // p_diagnostico
-  JSON.stringify([
-    { tipo_terapia: form.salud.atencionMedicaCual, frecuencia: form.salud.frecuenciaAtencion }
-  ]),                                    // p_terapias
-  JSON.stringify([
-    { nombre_medicamento: form.salud.medicamentosCuales, frecuencia: form.salud.medicamentosFrecuencia, hora: "08:00" }
-  ]),                                    // p_medicamentos
-  form.hogar.madreNombre,                // p_nombre_madre
-  form.hogar.ocupacionMadre,             // p_ocupacion_madre
-  form.hogar.padreNombre,                // p_nombre_padre
-  form.hogar.cuidadorNombre,             // p_nombre_cuidador
-  form.hogar.parentesco,                 // p_parentesco_cuidador
-  form.educativo.vinculadoOtraInst,      // p_matriculado_otra_institucion
-  form.educativo.ultimoGrado,            // p_ultimo_grado_cursado
-  form.educativo.institucionesIds        // p_instituciones_ids
-];
+  const mappedArray = [
+    idEstudiante.value, // p_estudiante_id
+    form.infoGeneral.direccion,            // p_direccion
+    form.infoGeneral.barrio,               // p_barrio
+    form.infoGeneral.telefono,             // p_telefono
+    form.infoGeneral.telefono,             // p_celular (si tienes campo específico, cámbialo)
+    form.infoGeneral.correo,               // p_email
+    form.infoGeneral.centroProteccion,     // p_modalidad_proteccion
+    "Defensoría del Pueblo",               // p_lugar_proteccion (ajusta si lo tienes en form)
+    form.infoGeneral.perteneceGrupoEtnico, // p_pertenece_grupo_etnico
+    form.descripcion.gustosIntereses,      // p_gustos_e_intereses
+    form.salud.afiliado,                   // p_afiliado_sistema
+    form.salud.regimenId,                  // p_regimen_id
+    form.salud.eps,                        // p_eps
+    form.salud.tieneDiagnostico,           // p_tiene_diagnostico
+    form.salud.diagnosticoCual,            // p_diagnostico
+    JSON.stringify([
+      { tipo_terapia: form.salud.atencionMedicaCual, frecuencia: form.salud.frecuenciaAtencion }
+    ]),                                    // p_terapias
+    JSON.stringify([
+      { nombre_medicamento: form.salud.medicamentosCuales, frecuencia: form.salud.medicamentosFrecuencia, hora: "08:00" }
+    ]),                                    // p_medicamentos
+    form.hogar.madreNombre,                // p_nombre_madre
+    form.hogar.ocupacionMadre,             // p_ocupacion_madre
+    form.hogar.padreNombre,                // p_nombre_padre
+    form.hogar.cuidadorNombre,             // p_nombre_cuidador
+    form.hogar.parentesco,                 // p_parentesco_cuidador
+    form.educativo.vinculadoOtraInst,      // p_matriculado_otra_institucion
+    form.educativo.ultimoGrado,            // p_ultimo_grado_cursado
+    form.educativo.institucionesIds        // p_instituciones_ids
+  ];
   // Mapeamos directamente desde form
-const mappedArrayExtras = [
-  // === IDENTIFICADOR ===
-  idEstudiante.value,          // p_estudiante_id
+  const mappedArrayExtras = [
+    // === IDENTIFICADOR ===
+    idEstudiante.value,          // p_estudiante_id
 
-  // === DATOS ADICIONALES DEL ESTUDIANTE ===
-  form.infoGeneral.registroVictimas,              // p_tiene_registro_victima
-  form.descripcion.expectativasEstudiante,        // p_expectativas_estudiante
-  form.descripcion.expectativasFamilia,           // p_expectativas_familia
-  form.descripcion.redesApoyo.otras,              // p_redes_apoyo
+    // === DATOS ADICIONALES DEL ESTUDIANTE ===
+    form.infoGeneral.registroVictimas,              // p_tiene_registro_victima
+    form.descripcion.expectativasEstudiante,        // p_expectativas_estudiante
+    form.descripcion.expectativasFamilia,           // p_expectativas_familia
+    form.descripcion.redesApoyo.otras,              // p_redes_apoyo
 
-  // === DATOS ADICIONALES DE SALUD ===
-  form.salud.lugarEmergencia,                     // p_lugar_atencion_emergencia
-  form.salud.tieneAtencionMedica,                 // p_tratamiento_especial
-  form.salud.detalleTratamiento,                  // p_tratamiento_detalle
-  form.salud.apoyosTecnicos,                      // p_apoyos_tecnicos
-  form.salud.apoyosTecnicosCuales,                // p_detalle_apoyos
-  JSON.stringify([
-    {
-      tipo_terapia: form.salud.atencionMedicaCual,
-      frecuencia: form.salud.frecuenciaAtencion
-    }
-  ]),                                             // p_terapias
-  JSON.stringify([
-    {
-      nombre_medicamento: form.salud.medicamentosCuales,
-      frecuencia: form.salud.medicamentosFrecuencia,
-      hora: "08:00"
-    }
-  ]),                                             // p_medicamentos
+    // === DATOS ADICIONALES DE SALUD ===
+    form.salud.lugarEmergencia,                     // p_lugar_atencion_emergencia
+    form.salud.tieneAtencionMedica,                 // p_tratamiento_especial
+    form.salud.detalleTratamiento,                  // p_tratamiento_detalle
+    form.salud.apoyosTecnicos,                      // p_apoyos_tecnicos
+    form.salud.apoyosTecnicosCuales,                // p_detalle_apoyos
+    JSON.stringify([
+      {
+        tipo_terapia: form.salud.atencionMedicaCual,
+        frecuencia: form.salud.frecuenciaAtencion
+      }
+    ]),                                             // p_terapias
+    JSON.stringify([
+      {
+        nombre_medicamento: form.salud.medicamentosCuales,
+        frecuencia: form.salud.medicamentosFrecuencia,
+        hora: "08:00"
+      }
+    ]),                                             // p_medicamentos
 
-  // === DATOS FAMILIARES ADICIONALES ===
-  form.hogar.nivelMadre,                          // p_nivel_educativo_madre
-  form.hogar.ocupacionPadre,                      // p_ocupacion_padre
-  form.hogar.nivelPadre,                          // p_nivel_educativo_padre
-  form.hogar.cuidadorNivel,                       // p_nivel_educativo_cuidador
-  form.hogar.cuidadorTelefono,                    // p_telefono_cuidador
-  form.hogar.cuidadorCorreo,                      // p_correo_cuidador
-  form.hogar.numHermanos,                         // p_numero_hermanos
-  form.hogar.lugarQueOcupa,                       // p_lugar_entre_hermanos
-  form.hogar.quienesApoyanCrianza,                // p_apoyan_crianza
-  form.hogar.personasConQuienVive,                // p_personas_con_quien_vive
-  form.hogar.fallecioMadre,                                           // p_madre_viva (valor por defecto)
-  form.hogar.fallecioPadre,                                           // p_padre_vivo (valor por defecto)
+    // === DATOS FAMILIARES ADICIONALES ===
+    form.hogar.nivelMadre,                          // p_nivel_educativo_madre
+    form.hogar.ocupacionPadre,                      // p_ocupacion_padre
+    form.hogar.nivelPadre,                          // p_nivel_educativo_padre
+    form.hogar.cuidadorNivel,                       // p_nivel_educativo_cuidador
+    form.hogar.cuidadorTelefono,                    // p_telefono_cuidador
+    form.hogar.cuidadorCorreo,                      // p_correo_cuidador
+    form.hogar.numHermanos,                         // p_numero_hermanos
+    form.hogar.lugarQueOcupa,                       // p_lugar_entre_hermanos
+    form.hogar.quienesApoyanCrianza,                // p_apoyan_crianza
+    form.hogar.personasConQuienVive,                // p_personas_con_quien_vive
+    form.hogar.fallecioMadre,                                           // p_madre_viva (valor por defecto)
+    form.hogar.fallecioPadre,                                           // p_padre_vivo (valor por defecto)
 
-  // === DATOS EDUCATIVOS ADICIONALES ===
-  form.educativo.otrasInstituciones,              // p_detalle_otras_instituciones
-  null,                                           // p_motivo_cambio (no existe en form)
-  form.educativo.estado,                          // p_estado_ultimo_grado
-  null,                                           // p_observaciones (no existe en form)
-  form.educativo.recibeInformePedagogico,         // p_recibe_informe
-  form.educativo.institucionInforme,              // p_institucion_informe
-  form.educativo.programasComplementarios,        // p_asiste_programas_complementarios
-  form.educativo.cualesProgramas                  // p_detalle_programas
-];
+    // === DATOS EDUCATIVOS ADICIONALES ===
+    form.educativo.otrasInstituciones,              // p_detalle_otras_instituciones
+    null,                                           // p_motivo_cambio (no existe en form)
+    form.educativo.estado,                          // p_estado_ultimo_grado
+    null,                                           // p_observaciones (no existe en form)
+    form.educativo.recibeInformePedagogico,         // p_recibe_informe
+    form.educativo.institucionInforme,              // p_institucion_informe
+    form.educativo.programasComplementarios,        // p_asiste_programas_complementarios
+    form.educativo.cualesProgramas                  // p_detalle_programas
+  ];
 
   console.log("Objeto mapeado desde form:", mappedArray);
   // console.log("Formulario principal:", form);
@@ -1656,7 +1670,7 @@ const mappedArrayExtras = [
     ElMessage.success("Datos guardados correctamente");
     const parametros2 = { spName: "fn_guardar_estudiante_complementario", params: mappedArrayExtras };
     GeneralService.ejecutarSP("fn_guardar_estudiante_complementario", parametros2);
-   
+
     paso.value = 1;
   } catch (e) {
     console.error(e);
@@ -1682,9 +1696,9 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
 
 // Cargas maestras (al entrar a Paso 2)
 const sp_perido_barrera = async (): Promise<void> => {
- const parametros2 = { spName: "sp_perido_barrera",  params: [form.informacion_piar.identificador_piar] };
-    GeneralService.ejecutarSP("sp_perido_barrera", parametros2);
-   
+  const parametros2 = { spName: "sp_perido_barrera", params: [form.informacion_piar.identificador_piar] };
+  GeneralService.ejecutarSP("sp_perido_barrera", parametros2);
+
 };
 
 // Cargas maestras (al entrar a Paso 2)
@@ -1710,7 +1724,7 @@ const prepararPaso2 = async (): Promise<void> => {
     paso.value = 2;
   } catch (error) {
     console.error('Error cargando datos iniciales:', error);
-   
+
   }
 };
 // ===== Dependientes por asignatura (padre simple -> hijo MULTI) =====
