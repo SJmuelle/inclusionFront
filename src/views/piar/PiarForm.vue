@@ -1996,7 +1996,7 @@ const eliminarBarrera = (areaId: string | number, index: number): void => {
   form.barreras.splice(index, 1);
 };
 
-const guardarAsignatura = (area: any) => {
+const guardarAsignatura = async (area: any) => {
   let dataEnviar = formularios[area];
   console.log(dataEnviar)
   const mappedArray = [
@@ -2016,7 +2016,7 @@ const guardarAsignatura = (area: any) => {
     GeneralService.ejecutarSP("fn_guardar_detalle_ajuste", parametros);
     ElMessage.success("Datos guardados correctamente");
 
-
+    await prepararPaso2();
     subpaso.value = 0;
   } catch (e) {
     console.error(e);
@@ -2105,6 +2105,7 @@ function agregarBarreras(area: any, periodo: any) {
   formularios[area_formulario.value].periodo = periodo;
   console.log(formularios[area_formulario.value])
   barrerasAgregadas.value = [];
+  
   // Aquí puedes abrir un modal o emitir un evento hacia el padre
 }
 
