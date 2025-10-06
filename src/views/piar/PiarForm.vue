@@ -59,7 +59,7 @@
           </div>
 
 
-          <!-- Acordeones paso 1-->
+          <!-- Acordeones paso 0-->
           <el-collapse v-model="activeNames" accordion v-if="paso == 0">
             <!-- Información General -->
             <el-collapse-item name="infoGeneral">
@@ -449,7 +449,7 @@
 
 
           <!-- PASO 1 -->
-          <div class="w-full h-full relative" v-if="paso === 1">
+          <div class="w-full  relative" v-if="paso === 1">
             <div class="p-4 space-y-6 ">
               <el-form :model="form2" label-position="top" :disabled="loading" class="bg-white grid md:grid-cols-2">
                 <el-form-item label="¿El estudiante requiere ajuste?">
@@ -477,125 +477,189 @@
 
           <!-- PASO 2 -->
           <div class="w-full h-full relative" v-if="paso == 2">
-            <div class="p-4 space-y-6">
-              <!-- aqui van la cosa esa de perido y luego este formulario -->
-              <el-tabs v-model="tabActivo" type="card">
-                <el-tab-pane v-for="a in asignaturasSeleccionadas" :key="a.area_id" :label="a.nombre_area"
-                  :name="a.area_id">
-                  <!-- Fila de selects encadenados -->
-                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                    <!-- Categoría de barrera (simple) -->
 
-                    <el-form-item label-position="top" label="Escoger Perido" class="w-full md:col-span-3">
-                      <el-select v-model="formularios[a.area_id].periodo"
-                        placeholder="Seleccione Peirido de evaluación de la barrera" filterable clearable>
-                        <el-option key="1" label="Perido I" value="1" />
-                        <el-option key="2" label="Perido II" value="2" />
-                        <el-option key="3" label="Perido III" value="3" />
-                      </el-select>
-                    </el-form-item>
+            <div class="space-y-4" v-if="subpaso == 0">
+              <el-collapse>
+                <el-collapse-item v-for="area in informacion_barrera" :key="area.area_id" :title="area.nombre_area">
+                  <div class="p-3 bg-gray-50 rounded-lg">
+                    <div v-for="(detalle, index) in area.detalle_json" :key="index"
+                      class="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                      <!-- 🔹 Encabezado del período -->
+                      <div class="flex justify-between items-center bg-blue-100 p-3 rounded-t-lg">
+                        <span class="font-semibold text-blue-700">
+                          Periodo: {{ detalle.periodo ?? '1' }}
+                        </span>
+                        <el-button type="primary" size="small"
+                          class="!bg-green-600 hover:!bg-green-900 text-white font-semibold hover:shadow-md"
+                          @click="agregarBarreras(area, detalle.periodo ?? '1')">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1"
+                            stroke="currentColor" class="size-4 text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                          </svg>
+
+                          Agregar barreras para este período
+                        </el-button>
+                      </div>
+
+                      <!-- 🔹 Tabla de barreras -->
+                      <el-table :data="barrerasUnicas" border stripe class="w-full text-sm">
+                        <!-- 🔹 Columna editar -->
+                        <el-table-column label="" width="80" align="center">
+                          <template #default="{ row }">
+                            <svg @click="editarDetalle(row)" xmlns="http://www.w3.org/2000/svg"
+                              class="w-5 h-5 cursor-pointer text-blue-600 hover:text-blue-800" fill="none"
+                              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" title="Editar detalle">
+                              <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.232 5.232l3.536 3.536M9 11l6.232-6.232a2.5 2.5 0 113.536 3.536L12.536 14.536a2.5 2.5 0 01-1.768.732H9v-2.268a2.5 2.5 0 01.732-1.768z" />
+                            </svg>
+                          </template>
+                        </el-table-column>
+
+                        <!-- 🔹 ID -->
+                        <el-table-column prop="detalle_id" label="ID Detalle" width="120" align="center" />
+
+                        <!-- 🔹 Descripción -->
+                        <el-table-column prop="descripcion_subcategoria" label="Descripción de la barrera">
+                          <template #default="{ row }">
+                            <p class="text-gray-700">{{ row.descripcion_subcategoria }}</p>
+                          </template>
+                        </el-table-column>
+                      </el-table>
 
 
-                    <el-form-item label-position="top" label="Categoría de barrera" class="w-full">
-                      <el-select v-model="formularios[a.area_id].categoriaId" placeholder="Seleccione categoría"
-                        filterable clearable @change="(val: any) => onChangeCategoria(a.area_id, val)">
-                        <el-option v-for="c in categoriasBarreras" :key="c.categoria_id" :label="c.nombre"
-                          :value="c.categoria_id" />
-                      </el-select>
-                    </el-form-item>
-
-                    <el-form-item label-position="top" label="Categoría de barrera" class="w-full md:col-span-2">
-                      <el-input disabled v-model="formularios[a.area_id].descripcionCategoria" style="width: 100%"
-                        :rows="2" type="textarea" placeholder="" />
-                    </el-form-item>
-
-                    <!-- Subcategorías (MULTI) -->
-                    <el-form-item label-position="top" label="Subcategorías" class="w-full md:col-span-3">
-                      <el-select v-model="formularios[a.area_id].subcategoriaIds" placeholder="Seleccione subcategorías"
-                        :disabled="!formularios[a.area_id].categoriaId" multiple collapse-tags filterable clearable>
-                        <el-option v-for="sc in formularios[a.area_id].subcategoriasOptions" :key="sc.subcategoria_id"
-                          :label="sc.descripcion" :value="sc.subcategoria_id" />
-                      </el-select>
-                    </el-form-item>
-
-                    <!-- Tipo de ajuste (simple) -->
-                    <el-form-item label-position="top" label="Tipo de ajuste" class="w-full">
-                      <el-select v-model="formularios[a.area_id].tipoAjusteId" placeholder="Seleccione tipo" filterable
-                        clearable @change="(val: any) => onChangeTipoAjuste(a.area_id, val)">
-                        <el-option v-for="t in tiposAjustes" :key="t.tipo_ajuste_id" :label="t.nombre"
-                          :value="t.tipo_ajuste_id">
-                        </el-option>
-                      </el-select>
-                    </el-form-item>
-
-                    <!-- Subtipos (MULTI) -->
-                    <el-form-item label-position="top" label="Subtipos" class="w-full col-span-2">
-                      <el-select v-model="formularios[a.area_id].subtipoAjusteIds" placeholder="Seleccione subtipos"
-                        :disabled="!formularios[a.area_id].tipoAjusteId" multiple collapse-tags filterable clearable>
-                        <el-option v-for="st in formularios[a.area_id].subtiposOptions" :key="st.subtipo_ajuste_id"
-                          :label="st.nombre" :value="st.subtipo_ajuste_id" />
-                      </el-select>
-                    </el-form-item>
-
-                    <!-- Apoyo requerido (simple) -->
-                    <el-form-item label-position="top" label="Apoyo requerido" class="w-full">
-                      <el-select v-model="formularios[a.area_id].apoyoId" placeholder="Seleccione apoyo" filterable
-                        clearable @change="(val: any) => onChangeApoyo(a.area_id, val)">
-                        <el-option v-for="ap in apoyosRequeridos" :key="ap.apoyo_id" :label="ap.nombre"
-                          :value="ap.apoyo_id" />
-                      </el-select>
-                    </el-form-item>
-
-                    <el-form-item label-position="top" label="Apoyo requerido" class="w-full md:col-span-2">
-                      <el-input disabled v-model="formularios[a.area_id].apoyoRequeridoDescripcion" style="width: 100%"
-                        :rows="2" type="textarea" placeholder="" />
-                    </el-form-item>
-
-                    <!-- Subapoyos (MULTI) -->
-                    <el-form-item label-position="top" label="Subapoyos" class="w-full md:col-span-3">
-                      <el-select v-model="formularios[a.area_id].subapoyoIds" placeholder="Seleccione subapoyos"
-                        :disabled="!formularios[a.area_id].apoyoId" multiple collapse-tags filterable clearable>
-                        <el-option v-for="sap in formularios[a.area_id].subapoyosOptions" :key="sap.subapoyo_id"
-                          :label="sap.descripcion" :value="sap.subapoyo_id" />
-                      </el-select>
-                    </el-form-item>
-
-                    <div class="mb-4">
-                      <el-button type="primary" @click="agregarBarrera(a.area_id)">
-                        Agregar barrera
-                      </el-button>
                     </div>
                   </div>
+                </el-collapse-item>
+              </el-collapse>
+            </div>
 
-                  <!-- Tabla de barreras agregadas -->
-                  <el-table :data="formularios[a.area_id].barreras" stripe style="width: 100%">
-                    <el-table-column label="Acciones" width="100">
-                      <template #default="scope">
-                        <el-button type="danger" size="small" @click="eliminarBarrera(a.area_id, scope.$index)">
-                          Eliminar
-                        </el-button>
-                      </template>
-                    </el-table-column>
-                    <el-table-column prop="barrera" label="Barrera" />
-                    <el-table-column prop="tipo" label="Tipo" />
-                  </el-table>
+            <div class="p-4 space-y-6" v-if="subpaso == 1">
+
+              <el-breadcrumb separator="/">
+                <el-breadcrumb-item>Asignatura: {{ formularios[area_formulario].nombreAsignatura }}
+                </el-breadcrumb-item>
+                <el-breadcrumb-item>
+                  Perido: {{ formularios[area_formulario].periodo }}
+                </el-breadcrumb-item>
+              </el-breadcrumb>
+
+              <!-- Fila de selects encadenados -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <el-form-item label-position="top" label="Categoría de barrera" class="w-full">
+                  <el-select v-model="formularios[area_formulario].categoriaId" placeholder="Seleccione categoría"
+                    filterable clearable @change="(val: any) => onChangeCategoria(area_formulario, val)">
+                    <el-option v-for="c in categoriasBarreras" :key="c.categoria_id" :label="c.nombre"
+                      :value="c.categoria_id" />
+                  </el-select>
+                </el-form-item>
+
+                <el-form-item label-position="top" label="Categoría de barrera" class="w-full md:col-span-2">
+                  <el-input disabled v-model="formularios[area_formulario].descripcionCategoria" style="width: 100%"
+                    :rows="2" type="textarea" placeholder="" />
+                </el-form-item>
+
+                <!-- Subcategorías (MULTI) -->
+                <el-form-item label-position="top" label="Subcategorías" class="w-full md:col-span-3">
+                  <el-select v-model="formularios[area_formulario].subcategoriaIds"
+                    placeholder="Seleccione subcategorías" :disabled="!formularios[area_formulario].categoriaId"
+                    multiple collapse-tags filterable clearable>
+                    <el-option v-for="sc in formularios[area_formulario].subcategoriasOptions" :key="sc.subcategoria_id"
+                      :label="sc.descripcion" :value="sc.subcategoria_id" />
+                  </el-select>
+                </el-form-item>
+
+                <!-- Tipo de ajuste (simple) -->
+                <el-form-item label-position="top" label="Tipo de ajuste" class="w-full">
+                  <el-select v-model="formularios[area_formulario].tipoAjusteId" placeholder="Seleccione tipo"
+                    filterable clearable @change="(val: any) => onChangeTipoAjuste(area_formulario, val)">
+                    <el-option v-for="t in tiposAjustes" :key="t.tipo_ajuste_id" :label="t.nombre"
+                      :value="t.tipo_ajuste_id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+
+                <!-- Subtipos (MULTI) -->
+                <el-form-item label-position="top" label="Subtipos" class="w-full col-span-2">
+                  <el-select v-model="formularios[area_formulario].subtipoAjusteIds" placeholder="Seleccione subtipos"
+                    :disabled="!formularios[area_formulario].tipoAjusteId" multiple collapse-tags filterable clearable>
+                    <el-option v-for="st in formularios[area_formulario].subtiposOptions" :key="st.subtipo_ajuste_id"
+                      :label="st.nombre" :value="st.subtipo_ajuste_id" />
+                  </el-select>
+                </el-form-item>
+
+                <!-- Apoyo requerido (simple) -->
+                <el-form-item label-position="top" label="Apoyo requerido" class="w-full">
+                  <el-select v-model="formularios[area_formulario].apoyoId" placeholder="Seleccione apoyo" filterable
+                    clearable @change="(val: any) => onChangeApoyo(area_formulario, val)">
+                    <el-option v-for="ap in apoyosRequeridos" :key="ap.apoyo_id" :label="ap.nombre"
+                      :value="ap.apoyo_id" />
+                  </el-select>
+                </el-form-item>
+
+                <el-form-item label-position="top" label="Apoyo requerido" class="w-full md:col-span-2">
+                  <el-input disabled v-model="formularios[area_formulario].apoyoRequeridoDescripcion"
+                    style="width: 100%" :rows="2" type="textarea" placeholder="" />
+                </el-form-item>
+
+                <!-- Subapoyos (MULTI) -->
+                <el-form-item label-position="top" label="Subapoyos" class="w-full md:col-span-3">
+                  <el-select v-model="formularios[area_formulario].subapoyoIds" placeholder="Seleccione subapoyos"
+                    :disabled="!formularios[area_formulario].apoyoId" multiple collapse-tags filterable clearable>
+                    <el-option v-for="sap in formularios[area_formulario].subapoyosOptions" :key="sap.subapoyo_id"
+                      :label="sap.descripcion" :value="sap.subapoyo_id" />
+                  </el-select>
+                </el-form-item>
+
+                <div class="mb-4">
+                  <el-button type="primary" @click="agregarBarrera(area_formulario)">
+                    Agregar barrera
+                  </el-button>
+                </div>
+              </div>
+
+              <!-- Tabla de barreras agregadas -->
 
 
+              <el-table :data="barrerasAgregadas" style="width: 100%" :row-key="(_: any, index: any) => index">
 
-                  <!-- Seguimiento -->
-                  <div class="space-y-2 mt-4">
-                    <h3 class="font-semibold text-sky-900">Seguimiento</h3>
-                    <QuillEditor v-model:content="formularios[a.area_id].seguimiento" contentType="html" />
-                  </div>
 
-                  <!-- boton guardar areas -->
-                  <div class="flex justify-end mt-4">
-                    <el-button type="success" :loading="saving">
-                      Guardar Asignatura
+                <!-- Columnas principales -->
+                <el-table-column prop="categoria" label="Categoría" />
+                <el-table-column prop="tipoAjuste" label="Tipo de ajuste" />
+                <el-table-column prop="apoyo" label="Apoyo" />
+
+                <!-- Botón eliminar -->
+                <el-table-column label="Acciones" width="120" align="center">
+                  <template #default="{ $index }">
+                    <el-button type="danger" size="small">
+                      Eliminar
                     </el-button>
-                  </div>
-                </el-tab-pane>
-              </el-tabs>
+                  </template>
+                </el-table-column>
+              </el-table>
+
+
+
+              <!-- Seguimiento -->
+              <div class="space-y-2 mt-4">
+                <h3 class="font-semibold text-sky-900">Seguimiento</h3>
+                <QuillEditor v-model:content="formularios[area_formulario].seguimiento" contentType="html" />
+              </div>
+
+
+              <el-form-item label-position="top" label="DBA" class="w-full md:col-span-2">
+                <el-input v-model="formularios[area_formulario].dba" style="width: 100%" :rows="2" type="textarea"
+                  placeholder="" />
+              </el-form-item>
+
+              <!-- boton guardar areas -->
+              <div class="flex justify-end mt-4">
+                <el-button type="success" :loading="saving" @click="guardarAsignatura(area_formulario)">
+                  Guardar Asignatura
+                </el-button>
+              </div>
+
+
             </div>
           </div>
 
@@ -726,13 +790,13 @@
         </el-button>
 
         <el-progress :percentage="10 + (paso) * 22.5" color="primary" show-text class="col-span-11">
-          <el-button text @click="paso = paso == 0 ? paso : paso - 1">
+          <el-button text @click="cambiarPaso(false)" class="hover:bg-blue-500">
             <svg xmlns="http://www.w3.org/2000/svg" fill="#79BBFF" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-8 text-blue-700 hover:bg-blue-700 hover:text-white rounded-full p-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </el-button>
-          <el-button text class="hover:bg-blue-500" @click="cambiarPaso()">
+          <el-button text class="hover:bg-blue-500" @click="cambiarPaso(true)">
             <svg xmlns="http://www.w3.org/2000/svg" fill="#79BBFF" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="size-8 text-blue-700 hover:bg-blue-700 hover:text-white rounded-full p-1">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -764,9 +828,31 @@ import { ElMessage } from "element-plus";
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { sw } from "element-plus/es/locales.mjs";
+const barrerasAgregadas = ref<any[]>([]);
+const area_formulario = ref(0);
+const periodo = ref(null);
 
 const paso = ref<number>(0)
+const subpaso = ref<number>(0)
+interface Barrera {
+  detalle_id: number
+  descripcion_subcategoria: string
+}
 
+interface Detalle {
+  periodo: number | null
+  nombreAsignatura: string
+  barreras: Barrera[]
+}
+
+interface Area {
+  area_id: number
+  nombre_area: string
+  detalle_json: Detalle[]
+}
+
+// 👉 Respuesta completa del backend
+const informacion_barrera = ref<Area[]>([])
 // Toolbar compacto + formatos permitidos
 const quillModules = {
   toolbar: [
@@ -863,6 +949,8 @@ interface BarreraFila {
 
 interface FormularioAsignatura {
   periodo: String | null;
+  nombreAsignatura: string;
+  dba: string;
   // padres (simple)
   categoriaId: number | null;
   tipoAjusteId: number | null;
@@ -872,6 +960,10 @@ interface FormularioAsignatura {
   subcategoriaIds: number[];     // <= multi
   subtipoAjusteIds: number[];    // <= multi
   subapoyoIds: number[];         // <= multi
+
+  subcategoriaIdsCompletos: number[];     // <= multi
+  subtipoAjusteIdsCompletos: number[];    // <= multi
+  subapoyoIdsCompletos: number[];         // <= multi
 
   // opciones dependientes por tab
   subcategoriasOptions: OpcionSubCategoria[];
@@ -902,6 +994,7 @@ const formularios: Record<string | number, FormularioAsignatura> = reactive({});
 const crearFormularioAsignatura = (): any => ({
   // padres
   periodo: null,
+  nombreAsignatura: "",
   // padres simples
   categoriaId: null,
   tipoAjusteId: null,
@@ -911,6 +1004,11 @@ const crearFormularioAsignatura = (): any => ({
   subcategoriaIds: [],
   subtipoAjusteIds: [],
   subapoyoIds: [],
+
+  // hijos multi
+  subcategoriaIdsCompletos: [],
+  subtipoAjusteIdsCompletos: [],
+  subapoyoIdsCompletos: [],
 
   // opciones dependientes
   subcategoriasOptions: [],
@@ -1505,11 +1603,11 @@ const actualizarAsignaturas = (seleccion: Asignatura[]): void => {
   asignaturasSeleccionadas.value = seleccion ?? [];
 
   // 2) Asegura que cada asignatura tenga su formulario creado
-  asignaturasSeleccionadas.value.forEach((a) => {
-    if (!formularios[a.area_id]) {
-      formularios[a.area_id] = crearFormularioAsignatura();
-    }
-  })
+  // asignaturasSeleccionadas.value.forEach((a) => {
+  //   if (!formularios[area_formulario.value]) {
+  //     formularios[area_formulario.value] = crearFormularioAsignatura();
+  //   }
+  // })
   // 3) Mantener el tab activo:
   //    - Si no hay selección, limpiar tab
   //    - Si el tab activo ya no está en la selección, moverlo al primero
@@ -1535,38 +1633,66 @@ const actualizarAsignaturas = (seleccion: Asignatura[]): void => {
   */
 };
 
-const cambiarPaso = async () => {
-  // let nuevoPaso = paso.value + 1;
-  // if (nuevoPaso === 2 ) {
-  //   // entrando a paso 2
-  //   await prepararPaso2();
-  // }
-  // paso = paso == 3 ? paso : paso + 1; paso == 2 ? prepararPaso2() : ''
-  switch (paso.value) {
-    case 0:
-      sp_guardar_estudiante_completos();
-      break;
-    case 1:
-      if (form2.requiere_ajuste == true) {
-        //si hay asignatura falta
-        console.log(asignaturasSeleccionadas.value);
-        if (asignaturasSeleccionadas.value.length > 0) {
-          await prepararPaso2();
+const cambiarPaso = async (arriba: boolean) => {
+  if (arriba) {
+    switch (paso.value) {
+      case 0:
+        sp_guardar_estudiante_completos();
+        break;
+      case 1:
+        if (form2.requiere_ajuste == true) {
+          //si hay asignatura falta
+          console.log(asignaturasSeleccionadas.value);
+          if (asignaturasSeleccionadas.value.length > 0) {
+            await prepararPaso2();
+            subpaso.value = 0
+          } else {
+            ElMessage.error('Oops, Almenos seleccione una area.')
+          }
 
         } else {
-          ElMessage.error('Oops, Almenos seleccione una area.')
+          paso.value = 3
         }
 
-      } else {
-        paso.value = 3
-      }
 
+        break;
+      case 4:
 
-      break;
-    default:
-      paso.value = paso.value + 1
-      break;
+        break;
+      default:
+        paso.value = paso.value + 1
+        break;
+    }
   }
+  else {
+    switch (paso.value) {
+      case 0:
+
+        break;
+      case 2:
+        if (form2.requiere_ajuste == true) {
+          //si hay asignatura falta
+          console.log(asignaturasSeleccionadas.value);
+          if (asignaturasSeleccionadas.value.length > 0) {
+            await prepararPaso2();
+            subpaso.value = 0
+          } else {
+            ElMessage.error('Oops, Almenos seleccione una area.')
+          }
+
+        } else {
+          paso.value = 3
+        }
+
+
+        break;
+      default:
+        paso.value = paso.value - 1
+        break;
+    }
+  }
+
+
 
   // paso.value = 1;
 };
@@ -1582,7 +1708,7 @@ const sp_guardar_estudiante_completos = async () => {
     form.infoGeneral.telefono,             // p_celular (si tienes campo específico, cámbialo)
     form.infoGeneral.correo,               // p_email
     form.infoGeneral.centroProteccion,     // p_modalidad_proteccion
-    "Defensoría del Pueblo",               // p_lugar_proteccion (ajusta si lo tienes en form)
+    form.infoGeneral.lugarProteccion,      // p_lugar_proteccion (ajusta si lo tienes en form)
     form.infoGeneral.perteneceGrupoEtnico, // p_pertenece_grupo_etnico
     form.descripcion.gustosIntereses,      // p_gustos_e_intereses
     form.salud.afiliado,                   // p_afiliado_sistema
@@ -1647,8 +1773,8 @@ const sp_guardar_estudiante_completos = async () => {
     form.hogar.lugarQueOcupa,                       // p_lugar_entre_hermanos
     form.hogar.quienesApoyanCrianza,                // p_apoyan_crianza
     form.hogar.personasConQuienVive,                // p_personas_con_quien_vive
-    form.hogar.fallecioMadre,                                           // p_madre_viva (valor por defecto)
-    form.hogar.fallecioPadre,                                           // p_padre_vivo (valor por defecto)
+    form.hogar.fallecioMadre,                       // p_madre_viva (valor por defecto)
+    form.hogar.fallecioPadre,                       // p_padre_vivo (valor por defecto)
 
     // === DATOS EDUCATIVOS ADICIONALES ===
     form.educativo.otrasInstituciones,              // p_detalle_otras_instituciones
@@ -1696,9 +1822,12 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
 
 // Cargas maestras (al entrar a Paso 2)
 const sp_perido_barrera = async (): Promise<void> => {
-  const parametros2 = { spName: "sp_perido_barrera", params: [form.informacion_piar.identificador_piar] };
-  GeneralService.ejecutarSP("sp_perido_barrera", parametros2);
-
+  const param = { spName: "fn_periodo_barreras_json_table", params: [idPiar.value] };
+  const res = await GeneralService.ejecutarSP("fn_periodo_barreras_json_table", param);
+  const inco = res;
+  if (inco) {
+    informacion_barrera.value = inco;
+  }
 };
 
 // Cargas maestras (al entrar a Paso 2)
@@ -1717,6 +1846,7 @@ const cargarApoyosRequeridos = async (): Promise<void> => {
 const prepararPaso2 = async (): Promise<void> => {
   try {
     await Promise.all([
+      sp_perido_barrera(),
       cargarCategoriasBarreras(),
       cargarTiposAjustes(),
       cargarApoyosRequeridos()
@@ -1777,19 +1907,86 @@ const onChangeApoyo = async (areaId: string | number, apoyoId: number | null): P
 // ===== Tabla "barreras" (si la mantienes) =====
 
 const agregarBarrera = (areaId: string | number): void => {
-  const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
+  const form = formularios[areaId];
+  // Validaciones
+  if (!form.categoriaId) {
+    ElMessage.error('Debe seleccionar una categoría de barrera.')
+    return
+  }
+  if (form.subcategoriaIds.length === 0) {
+    ElMessage.error('Debe seleccionar al menos una subcategoría.')
+    return
+  }
+  if (!form.tipoAjusteId) {
+    ElMessage.error('Debe seleccionar un tipo de ajuste.')
+    return
+  }
+  if (form.subtipoAjusteIds.length === 0) {
+    ElMessage.error('Debe seleccionar al menos un subtipo de ajuste.')
+    return
+  }
+  if (!form.apoyoId) {
+    ElMessage.error('Debe seleccionar un apoyo requerido.')
+    return
+  }
+  if (form.subapoyoIds.length === 0) {
+    ElMessage.error('Debe seleccionar al menos un subapoyo.')
+    return
+  }
 
-  const categoriaNombre = categoriasBarreras.value.find(x => x.categoria_id === form.categoriaId)?.nombre ?? '';
-  const tipoNombre = tiposAjustes.value.find(x => x.tipo_ajuste_id === form.tipoAjusteId)?.nombre ?? '';
+  // Si todo está OK, continúa
+  const categoria = categoriasBarreras.value.find(c => c.categoria_id === form.categoriaId)
+  const tipo = tiposAjustes.value.find(t => t.tipo_ajuste_id === form.tipoAjusteId)
+  const apoyo = apoyosRequeridos.value.find(a => a.apoyo_id === form.apoyoId)
 
-  if (!categoriaNombre || !tipoNombre) return;
+  const subcategorias = form.subcategoriasOptions
+    .filter((s: OpcionSubCategoria) => form.subcategoriaIds.includes(s.subcategoria_id))
+    .map((s: OpcionSubCategoria) => s.descripcion)
 
-  form.barreras.push({
-    barrera: categoriaNombre,
-    tipo: tipoNombre
-  });
+  const subtipos = form.subtiposOptions
+    .filter((st: OpcionSubTipo) => form.subtipoAjusteIds.includes(st.subtipo_ajuste_id))
+    .map((st: OpcionSubTipo) => st.nombre)
 
-  console.log(form)
+  const subapoyos = form.subapoyosOptions
+    .filter((sa: OpcionSubApoyo) => form.subapoyoIds.includes(sa.subapoyo_id))
+    .map((sa: OpcionSubApoyo) => sa.descripcion)
+
+  barrerasAgregadas.value.push({
+    categoria: categoria?.nombre || '',
+    descripcionCategoria: categoria?.descripcion || '',
+    subcategorias,
+    tipoAjuste: tipo?.nombre || '',
+    subtipos,
+    apoyo: apoyo?.nombre || '',
+    descripcionApoyo: apoyo?.descripcion || '',
+    subapoyos
+  })
+  console.log(barrerasAgregadas.value)
+  // ✅ Mensaje de éxito
+
+  ElMessage.success('Barrera agregada correctamente.')
+  let valores=formularios[areaId].subapoyoIdsCompletos.concat(form.subapoyoIds)
+  formularios[areaId].subapoyoIdsCompletos=valores
+  valores=formularios[areaId].subtipoAjusteIdsCompletos.concat(form.subtipoAjusteIds)
+  formularios[areaId].subtipoAjusteIdsCompletos=valores
+  valores=formularios[areaId].subcategoriaIdsCompletos.concat(form.subcategoriaIds)
+
+  formularios[areaId].subcategoriaIdsCompletos=valores
+
+
+  // Limpia selecciones para nueva entrada
+  formularios[areaId].categoriaId = null;
+  formularios[areaId].subcategoriaIds = [];
+  formularios[areaId].subcategoriasOptions = [];
+  formularios[areaId].tipoAjusteId = null;
+  formularios[areaId].subtipoAjusteIds = [];
+  formularios[areaId].subtiposOptions = [];
+  formularios[areaId].apoyoId = null;
+  formularios[areaId].subapoyoIds = [];
+  formularios[areaId].subapoyosOptions = [];
+  formularios[areaId].descripcionCategoria = "Seleccione una barrera";
+  formularios[areaId].apoyoRequeridoDescripcion = "Seleccione una barrera";
+
 
 };
 
@@ -1799,6 +1996,125 @@ const eliminarBarrera = (areaId: string | number, index: number): void => {
   form.barreras.splice(index, 1);
 };
 
+const guardarAsignatura = (area: any) => {
+  let dataEnviar = formularios[area];
+  console.log(dataEnviar)
+  const mappedArray = [
+    idPiar.value,                                   // p_piar_id (puedes reemplazarlo dinámico si es ref)
+    area_formulario.value,            // p_area_id
+    Number(dataEnviar.periodo),                     // p_periodo
+    dataEnviar.subcategoriaIdsCompletos,            // p_subcategoria_ids
+    dataEnviar.subtipoAjusteIdsCompletos,           // p_subtipo_ajuste_ids
+    dataEnviar.subapoyoIdsCompletos,                         // p_subapoyo_ids
+    dataEnviar.seguimiento,                         // p_observaciones (array con el texto del seguimiento)
+    dataEnviar.dba, // p_bdas
+    new Date().toISOString().split('T')[0]  // p_fecha_seguimiento (ej: '2025-10-06')
+  ];
+  saving.value = true;
+  try {
+    const parametros = { spName: "fn_guardar_detalle_ajuste", params: mappedArray };
+    GeneralService.ejecutarSP("fn_guardar_detalle_ajuste", parametros);
+    ElMessage.success("Datos guardados correctamente");
+
+
+    subpaso.value = 0;
+  } catch (e) {
+    console.error(e);
+    ElMessage.error("Error guardando los datos");
+  } finally {
+    saving.value = false;
+  }
+}
+
+// 👉 Función para fusionar filas con el mismo detalle_id
+function mergeRows(
+  { row, column, rowIndex, columnIndex }: any,
+  barreras: any[]
+): any {
+  // Combinar las columnas "detalle_id" y "descripcion_subcategoria"
+  if (
+    column.property === 'detalle_id' ||
+    column.property === 'descripcion_subcategoria'
+  ) {
+    const currentId = row.detalle_id
+    const groupRows = barreras.filter((b) => b.detalle_id === currentId)
+    const firstIndex = barreras.findIndex((b) => b.detalle_id === currentId)
+
+    if (rowIndex === firstIndex) {
+      return { rowspan: groupRows.length, colspan: 1 }
+    } else {
+      return { rowspan: 0, colspan: 0 }
+    }
+  }
+
+  return { rowspan: 1, colspan: 1 }
+}
+
+/**
+ * 🔹 Asigna una clase alterna a cada grupo (detalle_id)
+ * para sombrear los bloques visualmente.
+ */
+function getGroupRowClass(
+  { row, rowIndex }: any,
+  barreras: any[]
+): string {
+  const currentId = row.detalle_id
+  const firstIndex = barreras.findIndex((b) => b.detalle_id === currentId)
+  const groupIndex = Object.keys(
+    barreras
+      .filter((b, idx) => barreras.findIndex((g) => g.detalle_id === b.detalle_id) === idx)
+      .reduce((acc, g) => {
+        acc[g.detalle_id] = true
+        return acc
+      }, {} as Record<number, boolean>)
+  ).indexOf(String(currentId))
+
+  // Alternar color entre grupos
+  return groupIndex % 2 === 0 ? 'bg-gray-50' : 'bg-gray-100'
+}
+
+const barrerasUnicas = computed(() => {
+  const mapa = new Map<number, Barrera>()
+
+  informacion_barrera.value.forEach(area => {
+    area.detalle_json.forEach(detalle => {
+      detalle.barreras.forEach(b => {
+        if (!mapa.has(b.detalle_id)) {
+          mapa.set(b.detalle_id, {
+            detalle_id: b.detalle_id,
+            descripcion_subcategoria: b.descripcion_subcategoria
+          })
+        }
+      })
+    })
+  })
+
+  return Array.from(mapa.values())
+})
+
+/**
+ * 🔹 Evento: agregar nueva barrera
+ */
+function agregarBarreras(area: any, periodo: any) {
+  area_formulario.value = area.area_id;
+  subpaso.value = 1;
+  if (area_formulario.value) {
+    formularios[area_formulario.value] = crearFormularioAsignatura();
+  }
+  formularios[area_formulario.value].nombreAsignatura = area.nombre_area;
+  formularios[area_formulario.value].periodo = periodo;
+  console.log(formularios[area_formulario.value])
+  barrerasAgregadas.value = [];
+  // Aquí puedes abrir un modal o emitir un evento hacia el padre
+}
+
+/**
+ * 🔹 Evento: editar detalle (clic en icono)
+ */
+function editarDetalle(row: any) {
+  console.log('Editar detalle con ID:', row.detalle_id)
+  // Aquí podrías abrir un formulario modal de edición
+}
 </script>
 
 <style scoped>
