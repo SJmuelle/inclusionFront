@@ -663,9 +663,57 @@
             </div>
           </div>
 
-
-
+          <!-- PASO 3 -->
           <div class="w-full h-full relative" v-if="paso == 3">
+
+            <div class="d" v-if="subpaso == 0">
+              <h3 class="font-bold mb-3">Responsable principal</h3>
+
+              <div class="border rounded p-3 space-y-2">
+                <div v-for="opt in opcionesResponsable" :key="opt.value" class="flex items-center gap-2">
+                  <input type="radio" :value="opt.value" v-model="responsableSeleccionado" name="responsable" />
+                  <label>{{ opt.label }}</label>
+                </div>
+              </div>
+
+              <pre class="mt-4">
+      Seleccion actual: {{ responsableSeleccionado }}
+    </pre>
+            </div>
+            <div v-if="subpaso == 1"
+              class="w-full max-w-[900px] mx-auto font-sans text-[13px] leading-snug text-slate-800">
+              <!-- Título -->
+              <div class="grid grid-cols-1 md:grid-cols-4">
+                <div class="border border-slate-900">
+                  <div
+                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
+                    Actividades
+                  </div>
+                </div>
+                <div class="border border-slate-900">
+                  <div
+                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
+                    Descripción de la estrategia
+                  </div>
+                </div>
+                <div class="border border-slate-900">
+                  <div
+                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
+                    Frecuencia
+                  </div>
+                </div>
+                <div class="border border-slate-900">
+                  <div
+                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
+                    Compromiso
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="w-full h-full relative" v-if="paso == 4">
             <div class="w-full max-w-[900px] mx-auto font-sans text-[13px] leading-snug text-slate-800">
               <!-- Título -->
               <div class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
@@ -778,6 +826,8 @@
 
             </div>
           </div>
+
+
         </div>
       </div>
 
@@ -1024,7 +1074,7 @@ const crearFormularioAsignatura = (): any => ({
   seguimiento: ""
 });
 
-
+const listadoAcudiente = ref<any>(null);
 
 const router = useRouter();
 
@@ -1074,6 +1124,14 @@ const data = ref<any>({});
 const idPiar = ref<string>("")
 const barrerasOptions = ref<OpcionCategoria[]>([]);
 const idEstudiante = ref<string>("")
+interface OpcionResp {
+  label: string;
+  value: string;
+}
+
+/** estado */
+const responsableSeleccionado = ref<string | null>(null)
+const opcionesResponsable = ref<OpcionResp[]>([])   // <--- DECLARADO VACÍO
 const tiposOptions = ref([
   { id: 1, nombre: "Temporal" },
   { id: 2, nombre: "Permanente" },
@@ -1638,8 +1696,10 @@ const cambiarPaso = async (arriba: boolean) => {
     switch (paso.value) {
       case 0:
         sp_guardar_estudiante_completos();
+        prepararPaso1();
         break;
       case 1:
+        guardarPaso1();
         if (form2.requiere_ajuste == true) {
           //si hay asignatura falta
           console.log(asignaturasSeleccionadas.value);
@@ -1656,6 +1716,12 @@ const cambiarPaso = async (arriba: boolean) => {
 
 
         break;
+      case 2:
+        prepararPaso3();
+        subpaso.value = 0
+        paso.value = 3
+        break;
+
       case 4:
 
         break;
@@ -1675,13 +1741,14 @@ const cambiarPaso = async (arriba: boolean) => {
           console.log(asignaturasSeleccionadas.value);
           if (asignaturasSeleccionadas.value.length > 0) {
             await prepararPaso2();
+            paso.value = 1
             subpaso.value = 0
           } else {
             ElMessage.error('Oops, Almenos seleccione una area.')
           }
 
         } else {
-          paso.value = 3
+          paso.value = 1
         }
 
 
@@ -1695,6 +1762,88 @@ const cambiarPaso = async (arriba: boolean) => {
 
 
   // paso.value = 1;
+};
+
+const prepararPaso1 = async () => {
+  paso.value = 1;
+  const param = { spName: "fn_obtener_ajustes_estudiante2", params: [idEstudiante.value] };
+  const res = await GeneralService.ejecutarSP("fn_obtener_ajustes_estudiante2", param);
+  const inco = res[0]?.fn_obtener_ajustes_estudiante.data ?? null;
+  if (inco) {
+    console.log(inco);
+    form2.requiere_ajuste = inco?.requiere_ajuste
+    form2.trabaja_duba = inco?.trabaja_con_dua
+    form2.justificacion = inco?.descripcion
+    // informacion_barrera.value = inco;
+  }
+};
+
+const guardarPaso1 = async () => {
+  console.log(form2);
+  let enviar = [
+    idEstudiante.value,
+    form2.requiere_ajuste,
+    form2.trabaja_duba,
+    form2.justificacion]
+
+  const param = { spName: "fn_guardar_estudiante_ajustes", params: enviar };
+  const res = await GeneralService.ejecutarSP("fn_guardar_estudiante_ajustes", param);
+  const inco = res;
+  if (inco) {
+    console.log(inco);
+    // form2.requiere_ajuste = inco?.[0]?.sp_obtener_
+    // informacion_barrera.value = inco;
+  }
+
+  console.log(areas.value);
+
+  let enviar2 = [
+    idEstudiante.value,
+    JSON.stringify([{ "area_id": 6, "requiere_ajuste": true }, { "area_id": 3, "requiere_ajuste": false }])
+  ]
+
+  const param2 = { spName: "fn_asignar_multiples_areas_ajuste", params: enviar2 };
+  const res2 = await GeneralService.ejecutarSP("fn_asignar_multiples_areas_ajuste", param2);
+  const inco2 = res2;
+  if (inco2) {
+    console.log(inco2);
+    // form2.requiere_ajuste = inco?.[0]?.sp_obtener_
+    // informacion_barrera.value = inco;
+
+  }
+};
+
+const prepararPaso3 = async () => {
+  paso.value = 1;
+  const param = { spName: "fn_listar_acudientes_estudiante", params: [idEstudiante.value] };
+  const res = await GeneralService.ejecutarSP("fn_listar_acudientes_estudiante", param);
+  const inco = res[0]?.fn_listar_acudientes_estudiante.data ?? null;
+  if (inco) {
+    console.log(inco);
+    debugger
+    listadoAcudiente.value = inco[0]
+    // 1) Armamos opciones desde la data
+    opcionesResponsable.value = [
+      {
+        label: `Madre (${listadoAcudiente.value.madre.nombre})`,
+        value: 'madre'
+      },
+      {
+        label: `Padre (${listadoAcudiente.value.padre.nombre})`,
+        value: 'padre'
+      },
+      {
+        label: `Cuidador (${listadoAcudiente.value.cuidador.nombre})`,
+        value: 'cuidador'
+      }
+    ]
+
+    // 2) Estado seleccionado (inicial según dato del backend)
+    responsableSeleccionado.value = (
+      listadoAcudiente.value.acudiente_principal.tipo.toLowerCase()   // Madre → madre
+    )
+    // informacion_barrera.value = inco;
+  }
 };
 const sp_guardar_estudiante_completos = async () => {
   // paso.value=1
@@ -1797,7 +1946,7 @@ const sp_guardar_estudiante_completos = async () => {
     const parametros2 = { spName: "fn_guardar_estudiante_complementario", params: mappedArrayExtras };
     GeneralService.ejecutarSP("fn_guardar_estudiante_complementario", parametros2);
 
-    paso.value = 1;
+
   } catch (e) {
     console.error(e);
     ElMessage.error("Error guardando los datos");
@@ -1822,8 +1971,8 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
 
 // Cargas maestras (al entrar a Paso 2)
 const sp_perido_barrera = async (): Promise<void> => {
-  const param = { spName: "fn_periodo_barreras_json_table", params: [idPiar.value] };
-  const res = await GeneralService.ejecutarSP("fn_periodo_barreras_json_table", param);
+  const param = { spName: "fn_periodo_barreras_json_table_requiere_ajuste", params: [idPiar.value] };
+  const res = await GeneralService.ejecutarSP("fn_periodo_barreras_json_table_requiere_ajuste", param);
   const inco = res;
   if (inco) {
     informacion_barrera.value = inco;
@@ -1965,13 +2114,13 @@ const agregarBarrera = (areaId: string | number): void => {
   // ✅ Mensaje de éxito
 
   ElMessage.success('Barrera agregada correctamente.')
-  let valores=formularios[areaId].subapoyoIdsCompletos.concat(form.subapoyoIds)
-  formularios[areaId].subapoyoIdsCompletos=valores
-  valores=formularios[areaId].subtipoAjusteIdsCompletos.concat(form.subtipoAjusteIds)
-  formularios[areaId].subtipoAjusteIdsCompletos=valores
-  valores=formularios[areaId].subcategoriaIdsCompletos.concat(form.subcategoriaIds)
+  let valores = formularios[areaId].subapoyoIdsCompletos.concat(form.subapoyoIds)
+  formularios[areaId].subapoyoIdsCompletos = valores
+  valores = formularios[areaId].subtipoAjusteIdsCompletos.concat(form.subtipoAjusteIds)
+  formularios[areaId].subtipoAjusteIdsCompletos = valores
+  valores = formularios[areaId].subcategoriaIdsCompletos.concat(form.subcategoriaIds)
 
-  formularios[areaId].subcategoriaIdsCompletos=valores
+  formularios[areaId].subcategoriaIdsCompletos = valores
 
 
   // Limpia selecciones para nueva entrada
@@ -2105,7 +2254,7 @@ function agregarBarreras(area: any, periodo: any) {
   formularios[area_formulario.value].periodo = periodo;
   console.log(formularios[area_formulario.value])
   barrerasAgregadas.value = [];
-  
+
   // Aquí puedes abrir un modal o emitir un evento hacia el padre
 }
 
