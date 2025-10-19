@@ -664,33 +664,55 @@
           </div>
 
           <!-- PASO 3 -->
-          <div class="w-full h-full relative" v-if="paso == 3">
+          <div class="w-full relative " v-if="paso == 3">
 
             <div class="d" v-if="subpaso == 0">
-              <h3 class="font-bold mb-3">Responsable principal</h3>
+              <h3 class="font-bold mb-3">Elija el acudiente principal encargado de la responsabilidad asociada al
+                compromiso del
+                PIAR</h3>
 
-              <div class="border rounded p-3 space-y-2">
+              <div class="border rounded p-3 space-y-2 my-2">
                 <div v-for="opt in opcionesResponsable" :key="opt.value" class="flex items-center gap-2">
                   <input type="radio" :value="opt.value" v-model="responsableSeleccionado" name="responsable" />
                   <label>{{ opt.label }}</label>
                 </div>
               </div>
 
-              <pre class="mt-4">
-      Seleccion actual: {{ responsableSeleccionado }}
-    </pre>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="div">
+                  <h3 class="font-bold mb-3">Numero de identificacion del acudiente</h3>
+                  <el-input v-model="formAcudiente.numero" type="number" />
+                </div>
+
+                <div class="div">
+                  <h3 class="font-bold mb-3">Correo acudiente </h3>
+                  <el-input v-model="formAcudiente.correo" type="email" />
+                </div>
+
+              </div>
+
+
+
+
+              <div class="flex w-full justify-end mt-3">
+                <el-button type="success" @click="agregarResponsable()">
+                  Agregar responsable
+                </el-button>
+              </div>
+
+
             </div>
-            <div v-if="subpaso == 1"
-              class="w-full max-w-[900px] mx-auto font-sans text-[13px] leading-snug text-slate-800">
+            <div v-if="subpaso == 1" class="w-full  mx-auto font-sans text-[13px] leading-snug text-slate-800">
               <!-- Título -->
-              <div class="grid grid-cols-1 md:grid-cols-4">
+              <div class="grid grid-cols-1 md:grid-cols-10">
                 <div class="border border-slate-900">
                   <div
                     class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
                     Actividades
                   </div>
                 </div>
-                <div class="border border-slate-900">
+                <div class="border border-slate-900 md:col-span-2">
                   <div
                     class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
                     Descripción de la estrategia
@@ -702,12 +724,73 @@
                     Frecuencia
                   </div>
                 </div>
-                <div class="border border-slate-900">
+                <div class="border border-slate-900 md:col-span-4">
                   <div
                     class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
                     Compromiso
                   </div>
                 </div>
+                <div class="border border-slate-900 ">
+                  <div
+                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
+                    Estado
+                  </div>
+                </div>
+                 <div class="border border-slate-900 ">
+                  <div
+                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
+                    Acción
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-10" v-for="opt in actividad_compromiso" :key="opt.compromiso_id">
+                <div class="border border-slate-900 p-1 flex justify-center items-center">
+                  {{ opt.nombre_actividad }}
+                </div>
+                <div class="border border-slate-900 p-1 flex justify-center items-center md:col-span-2">
+                  <div v-html="opt.descripcion">
+
+                  </div>
+
+
+                </div>
+                <div class="border border-slate-900 p-1 align-baseline flex justify-center items-center">
+                  <el-select v-model="opt.frecuencia" placeholder="Seleccione Frecuencia" filterable clearable class="">
+                    <el-option label="Semestral" value="Semestral" />
+                    <el-option label="Mensual" value="Mensual" />
+                    <el-option label="Semanal" value="Semanal" />
+                    <el-option label="Diaria" value="Diaria" />
+                  </el-select>
+                </div>
+                <div class="border border-slate-900 p-1  md:col-span-4 ">
+                  <div class="">
+                    <QuillEditor v-model:content="opt.informacion_piar.descripcion_compromiso" contentType="html"
+                      class="" />
+                  </div>
+                </div>
+
+                 <div class="border border-slate-900 p-1  flex justify-center items-center ">
+                  <div class="">
+                       <el-alert title="Pendiente" type="warning" :closable="false" />
+                  </div>
+                </div>
+
+                 <div class="border border-slate-900 p-1  flex justify-center items-center ">
+                  <div class="">
+                      <el-button type="danger" plain>Eliminar</el-button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="flex justify-center p-2 text-2xl border border-green-700 hover:text-white cursor hover:bg-green-700 text-center "
+                @click="dialogFormVisible = true; modalActividad = null; descripcionActividadesCargar = []">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                  stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+
               </div>
             </div>
           </div>
@@ -815,12 +898,7 @@
                   Incluya aquí los compromisos específicos para implementar en el aula que requieran ampliación o
                   detalle adicional al incluido en el PIAR.
                 </div>
-                <div class=" p-3 mt-2 min-h-[110px] pb-32">
-                  <!-- Si viene de Quill/HTML -->
-                  <QuillEditor v-model:content="acta.compromisosEspecificos" t contentType="html" />
 
-
-                </div>
               </div>
 
 
@@ -864,6 +942,37 @@
   <div v-else class="p-6">
     <el-skeleton :rows="6" animated />
   </div>
+
+  <!-- MODAL -->
+  <el-dialog v-model="dialogFormVisible" title="Seleccionar actividad" width="500">
+
+    <el-form>
+      <el-form-item label="Área">
+        <el-select v-model="modalActividad" placeholder="Seleccione un área" @change="cargarOpciones">
+          <el-option label="Salud" value="Salud" />
+          <el-option label="Calculo" value="Cálculo" />
+          <el-option label="Escritura" value="Escritura" />
+          <el-option label="Lectura" value="Lectura" />
+        </el-select>
+      </el-form-item>
+    </el-form>
+
+    <el-table :data="descripcionActividadesCargar" style="width: 100%"
+      @selection-change="fn_SeleccionadasDescripcionActividadesCargar" height="300">
+      <el-table-column type="selection" width="55"></el-table-column>
+      <el-table-column prop="descripcion" label="Descripción">
+      </el-table-column>
+    </el-table>
+
+
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">Cancelar</el-button>
+        <el-button type="primary" @click="cerrarModal()">Confirmar</el-button>
+      </div>
+    </template>
+
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -872,7 +981,7 @@ import { onMounted, ref, reactive, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { TimelineItemProps } from "element-plus";
 import { Fold } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, formMetaProps } from "element-plus";
 
 /* Quill */
 import { QuillEditor } from '@vueup/vue-quill'
@@ -881,7 +990,10 @@ import { sw } from "element-plus/es/locales.mjs";
 const barrerasAgregadas = ref<any[]>([]);
 const area_formulario = ref(0);
 const periodo = ref(null);
-
+const modalActividad = ref(null);
+const modalDescripcionActividad = ref(null);
+const opcionesActividades = ref<any[]>([]);
+const dialogFormVisible = ref(false);
 const paso = ref<number>(0)
 const subpaso = ref<number>(0)
 interface Barrera {
@@ -1040,6 +1152,7 @@ const apoyosRequeridos = ref<OpcionApoyoRequerido[]>([]);
 // Por asignatura:
 const formularios: Record<string | number, FormularioAsignatura> = reactive({});
 
+const actividad_compromiso = ref<any[]>([]);
 // Factory
 const crearFormularioAsignatura = (): any => ({
   // padres
@@ -1119,7 +1232,13 @@ const drawerOpen = ref(true);
 const drawerMode = ref<"side" | "over">("side");
 
 const activeNames = ref<string | number>("infoGeneral");
+const descripcionActividadesCargar = ref<any>();
 
+interface Actividad {
+  id: number;
+  descripcion: string;
+}
+const SeleccionadasDescripcionActividadesCargar = ref<Actividad[]>([]);
 const data = ref<any>({});
 const idPiar = ref<string>("")
 const barrerasOptions = ref<OpcionCategoria[]>([]);
@@ -1137,6 +1256,12 @@ const tiposOptions = ref([
   { id: 2, nombre: "Permanente" },
 ]);
 /** ===== FORM PRINCIPAL (Step 1) ===== */
+
+const formAcudiente = ref<any>({
+  correo: "",
+  numeroIdentificacion: ""
+});
+
 const form = reactive<any>({
   infoGeneral: {
     nombres: "",
@@ -1244,6 +1369,7 @@ const form2 = reactive<any>({
   justificacion: "",
   areas: [],
 });
+
 
 
 /** ===== Helpers ===== */
@@ -1485,6 +1611,11 @@ const preseleccionarUbicacionDesdeTexto = () => {
   }
 };
 
+const fn_SeleccionadasDescripcionActividadesCargar = (val: any[]) => {
+
+  SeleccionadasDescripcionActividadesCargar.value = val;
+};
+
 const preseleccionarRegimenDesdeTexto = () => {
   if (!listado.value) return;
   const regTexto = sinAcentos(form.salud.regimen);
@@ -1593,6 +1724,8 @@ onMounted(async () => {
   const usuario = usuarioStr ? JSON.parse(usuarioStr) : null;
   acta.personaDiligencia = usuario?.nombre ?? "";
 });
+
+
 
 /** ===== Guardar (borrador) ===== */
 const saveDraft = async () => {
@@ -1762,6 +1895,92 @@ const cambiarPaso = async (arriba: boolean) => {
 
 
   // paso.value = 1;
+};
+
+const cerrarModal = () => {
+  let data = [...actividad_compromiso.value];
+  const nombre = modalActividad.value
+
+  // 1) Generar descripciones nuevas
+  const nuevas = SeleccionadasDescripcionActividadesCargar.value.map(a => a.descripcion)
+
+  // 2) Buscar si ya existe esa actividad
+  const idx = data.findIndex(o => o.nombre_actividad === nombre)
+
+  if (idx >= 0) {
+    // Ya existe → concatenar sin duplicar
+    const existentes = data[idx].descripcion_items as string[] // <-- si decides guardarlo como array
+    const unicas = Array.from(new Set([...existentes, ...nuevas])) // evita repeticiones
+
+    data[idx].descripcion_items = unicas
+    // si sigues queriendo HTML también lo puedes regenerar:
+    data[idx].descripcion = unicas.map((d, i) => `<p>${i + 1}. ${d}</p>`).join("")
+
+  } else {
+    // No existe → crear nuevo
+    data.push({
+      nombre_actividad: nombre,
+      // Guardar array real aparte es mejor para deduplicar luego:
+      descripcion_items: nuevas,
+      descripcion: nuevas.map((d, i) => `<p>${i + 1}. ${d}</p>`).join(""),
+      informacion_piar: { descripcion_compromiso: "" }
+    })
+  }
+
+  actividad_compromiso.value = [...data]
+  dialogFormVisible.value = false
+}
+
+const agregarResponsable = async () => {
+  const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const { numero, correo } = formAcudiente.value
+
+  // numero
+  if (!numero || numero.trim() === '') {
+    ElMessage.error('El número es obligatorio')
+    return false
+  }
+  if (numero.length < 5 || numero.length > 10) {
+    ElMessage.error('El número debe tener entre 5 y 10 caracteres')
+    return false
+  }
+
+  // correo
+  if (!correo || correo.trim() === '') {
+    ElMessage.error('El correo es obligatorio')
+    return false
+  }
+  if (!regexCorreo.test(correo)) {
+    ElMessage.error('El correo no tiene un formato válido')
+    return
+  }
+
+  const param1 = { spName: "fn_asignar_acudiente_estudiante", params: [idEstudiante.value, listadoAcudiente.value.cuidador.acudiente_id, responsableSeleccionado.value, formAcudiente.value.numero, formAcudiente.value.correo] };
+  const res1 = await GeneralService.ejecutarSP("fn_asignar_acudiente_estudiante", param1);
+  const inco1 = res1[0]?.fn_asignar_acudiente_estudiante.data ?? null;
+
+
+  subpaso.value = 1;
+
+  const param = { spName: "fn_consultar_compromisos_actividades", params: [idPiar.value, listadoAcudiente.value.cuidador.acudiente_id] };
+  const res = await GeneralService.ejecutarSP("fn_consultar_compromisos_actividades", param);
+  const inco = res[0]?.fn_consultar_compromisos_actividades.data ?? null;
+  if (inco) {
+
+    actividad_compromiso.value = inco;
+    console.log(inco);
+
+    // informacion_barrera.value = inco;
+  }
+  // const parametros = { spName, params };
+  // try {
+  //   const result = await GeneralService.ejecutarSP(spName, parametros);
+  //   // Estructura esperada: result?.[0]?.[spName] === array
+  //   return (result?.[0]?.[spName] ?? []) as T[];
+  // } catch (err) {
+  //   console.error(`Error ejecutando ${spName}:`, err);
+  //   return [];
+  // }
 };
 
 const prepararPaso1 = async () => {
@@ -1966,6 +2185,16 @@ const callSP = async <T = any>(spName: string, params: any[] = []): Promise<T[]>
   } catch (err) {
     console.error(`Error ejecutando ${spName}:`, err);
     return [];
+  }
+};
+
+// al cambiar actividad → llama API y llena segundo select
+const cargarOpciones = async (val: string) => {
+  const param = { spName: "fn_listar_actividades_por_area", params: [val] };
+  const res = await GeneralService.ejecutarSP("fn_listar_actividades_por_area", param);
+  const inco = res[0].fn_listar_actividades_por_area.data;
+  if (inco) {
+    descripcionActividadesCargar.value = inco["salud"].actividades;
   }
 };
 
@@ -2257,6 +2486,7 @@ function agregarBarreras(area: any, periodo: any) {
 
   // Aquí puedes abrir un modal o emitir un evento hacia el padre
 }
+
 
 /**
  * 🔹 Evento: editar detalle (clic en icono)
