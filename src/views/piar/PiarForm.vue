@@ -502,7 +502,7 @@
                       </div>
 
                       <!-- 🔹 Tabla de barreras -->
-                      <el-table :data="barrerasUnicas" border stripe class="w-full text-sm">
+                      <el-table :data="detalle.barreras" border stripe class="w-full text-sm">
                         <!-- 🔹 Columna editar -->
                         <el-table-column label="" width="80" align="center">
                           <template #default="{ row }">
@@ -519,14 +519,34 @@
                         <el-table-column prop="detalle_id" label="ID Detalle" width="120" align="center" />
 
                         <!-- 🔹 Descripción -->
-                        <el-table-column prop="descripcion_subcategoria" label="Descripción de la barrera">
+                        <el-table-column prop="nombre_subcategoria" label="Descripción de la barrera">
                           <template #default="{ row }">
-                            <p class="text-gray-700">{{ row.descripcion_subcategoria }}</p>
+                            <p class="text-gray-700">{{ row.nombre_subcategoria }}</p>
+                          </template>
+                        </el-table-column>
+
+                        <el-table-column prop="nombre_subapoyo" label="Descripción de la barrera">
+                          <template #default="{ row }">
+                            <p class="text-gray-700">{{ row.nombre_subapoyo }}</p>
                           </template>
                         </el-table-column>
                       </el-table>
 
 
+                    </div>
+
+                    <!-- ⚡ NUEVO: Botón para agregar un nuevo período -->
+                    <div class="text-right mt-3"
+                      v-if="(Number(area.detalle_json[area.detalle_json.length - 1].periodo)) < 3">
+                      <el-button type="warning" size="small"
+                        class="!bg-yellow-500 hover:!bg-yellow-700 text-white font-semibold"
+                        @click="agregarBarreras(area, (Number(area.detalle_json[area.detalle_json.length - 1].periodo) + 1))">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1"
+                          stroke="currentColor" class="size-4 text-white">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Agregar nuevo período
+                      </el-button>
                     </div>
                   </div>
                 </el-collapse-item>
@@ -632,7 +652,11 @@
                 <el-table-column label="Acciones" width="120" align="center">
                   <template #default="{ $index }">
                     <el-button type="danger" size="small">
-                      Eliminar
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
                     </el-button>
                   </template>
                 </el-table-column>
@@ -703,84 +727,62 @@
 
 
             </div>
-            <div v-if="subpaso == 1" class="w-full  mx-auto font-sans text-[13px] leading-snug text-slate-800">
-              <!-- Título -->
-              <div class="grid grid-cols-1 md:grid-cols-10">
-                <div class="border border-slate-900">
-                  <div
-                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
-                    Actividades
-                  </div>
-                </div>
-                <div class="border border-slate-900 md:col-span-2">
-                  <div
-                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
-                    Descripción de la estrategia
-                  </div>
-                </div>
-                <div class="border border-slate-900">
-                  <div
-                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
-                    Frecuencia
-                  </div>
-                </div>
-                <div class="border border-slate-900 md:col-span-4">
-                  <div
-                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
-                    Compromiso
-                  </div>
-                </div>
-                <div class="border border-slate-900 ">
-                  <div
-                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
-                    Estado
-                  </div>
-                </div>
-                 <div class="border border-slate-900 ">
-                  <div
-                    class="w-full border border-slate-700 bg-slate-700 text-white text-center uppercase font-bold py-2">
-                    Acción
-                  </div>
-                </div>
-              </div>
+            <div v-if="subpaso == 1" class="w-full  mx-auto font-sans text-[10px] leading-snug text-slate-800">
+              <div class="overflow-x-auto">
+                <table class="min-w-full border border-slate-900">
+                  <thead>
+                    <tr class="bg-slate-700 text-white text-center font-bold">
+                      <th class="border border-slate-900 px-2 py-2">Actividades</th>
+                      <th class="border border-slate-900 px-2 py-2">Descripción de la estrategia</th>
+                      <th class="border border-slate-900 px-2 py-2">Frecuencia</th>
+                      <th class="border border-slate-900 px-2 py-2">Compromiso</th>
+                      <th class="border border-slate-900 px-2 py-2">Estado</th>
+                      <th class="border border-slate-900 px-2 py-2">Acción</th>
+                    </tr>
+                  </thead>
 
-              <div class="grid grid-cols-1 md:grid-cols-10" v-for="opt in actividad_compromiso" :key="opt.compromiso_id">
-                <div class="border border-slate-900 p-1 flex justify-center items-center">
-                  {{ opt.nombre_actividad }}
-                </div>
-                <div class="border border-slate-900 p-1 flex justify-center items-center md:col-span-2">
-                  <div v-html="opt.descripcion">
+                  <tbody>
+                    <tr v-for="opt in actividad_compromiso" :key="opt.compromiso_id"
+                      class="text-center hover:bg-slate-100">
+                      <td class="border border-slate-900 px-2 py-2">
+                        {{ opt.nombre_actividad }}
+                      </td>
 
-                  </div>
+                      <td class="border border-slate-900 px-2 py-2">
+                        <div v-html="opt.descripcion" class="text-left capitalize"></div>
+                      </td>
 
+                      <td class="border border-slate-900 px-2 py-2">
+                        <el-select v-model="opt.frecuencia" placeholder="Seleccione" filterable clearable size="small">
+                          <el-option label="Semestral" value="Semestral" />
+                          <el-option label="Mensual" value="Mensual" />
+                          <el-option label="Semanal" value="Semanal" />
+                          <el-option label="Diaria" value="Diaria" />
+                        </el-select>
+                      </td>
 
-                </div>
-                <div class="border border-slate-900 p-1 align-baseline flex justify-center items-center">
-                  <el-select v-model="opt.frecuencia" placeholder="Seleccione Frecuencia" filterable clearable class="">
-                    <el-option label="Semestral" value="Semestral" />
-                    <el-option label="Mensual" value="Mensual" />
-                    <el-option label="Semanal" value="Semanal" />
-                    <el-option label="Diaria" value="Diaria" />
-                  </el-select>
-                </div>
-                <div class="border border-slate-900 p-1  md:col-span-4 ">
-                  <div class="">
-                    <QuillEditor v-model:content="opt.informacion_piar.descripcion_compromiso" contentType="html"
-                      class="" />
-                  </div>
-                </div>
+                      <td class="border border-slate-900  text-left">
+                        <QuillEditor v-model:content="opt.informacion_piar.descripcion_compromiso" contentType="html"
+                          class="rounded-lg border border-gray-200 focus-within:ring-1 focus-within:ring-blue-300 bg-slate-50 p-2 text-sm min-h-[100px]" />
+                      </td>
 
-                 <div class="border border-slate-900 p-1  flex justify-center items-center ">
-                  <div class="">
-                       <el-alert title="Pendiente" type="warning" :closable="false" />
-                  </div>
-                </div>
+                      <td class="border border-slate-900 px-2 py-2">
+                        <el-alert title="Pendiente" class="text-xs capitalize" type="warning" :closable="false" />
+                      </td>
 
-                 <div class="border border-slate-900 p-1  flex justify-center items-center ">
-                  <div class="">
-                      <el-button type="danger" plain>Eliminar</el-button>
-                  </div>
-                </div>
+                      <td class="border border-slate-900 px-2 py-2">
+                        <el-button type="danger" @click="eliminarCompromiso(opt.compromiso_id)" plain size="small">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="py-1 size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                          </svg>
+
+                        </el-button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
               <div
@@ -790,7 +792,6 @@
                   stroke="currentColor" class="size-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-
               </div>
             </div>
           </div>
@@ -837,7 +838,7 @@
                       Sede
                     </th>
                     <td class="border border-slate-700 p-2">
-                      {{ acta.sede }}
+                      Principal
                     </td>
                   </tr>
                 </tbody>
@@ -981,12 +982,13 @@ import { onMounted, ref, reactive, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { TimelineItemProps } from "element-plus";
 import { Fold } from "@element-plus/icons-vue";
-import { ElMessage, formMetaProps } from "element-plus";
+import { ElMessage, ElMessageBox, formMetaProps } from "element-plus";
 
 /* Quill */
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { sw } from "element-plus/es/locales.mjs";
+// const router = useRouter();
 const barrerasAgregadas = ref<any[]>([]);
 const area_formulario = ref(0);
 const periodo = ref(null);
@@ -998,13 +1000,13 @@ const paso = ref<number>(0)
 const subpaso = ref<number>(0)
 interface Barrera {
   detalle_id: number
-  descripcion_subcategoria: string
+  nombre_subcategoria: string
 }
 
 interface Detalle {
   periodo: number | null
   nombreAsignatura: string
-  barreras: Barrera[]
+  barreras: any[]
 }
 
 interface Area {
@@ -1743,6 +1745,41 @@ const saveDraft = async () => {
   }
 };
 
+const eliminarCompromiso = async (id: number) => {
+  try {
+    await ElMessageBox.confirm(
+      '¿Está seguro de que desea eliminar este compromiso?',
+      'Confirmar eliminación',
+      {
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        type: 'warning',
+      }
+    );
+
+    const index = actividad_compromiso.value.findIndex(
+      (item) => item.compromiso_id === id
+    );
+
+    if (index !== -1) {
+      actividad_compromiso.value.splice(index, 1);
+      ElMessage({
+        type: 'success',
+        message: 'Compromiso eliminado correctamente',
+      });
+    } else {
+      ElMessage({
+        type: 'error',
+        message: 'No se encontró el compromiso a eliminar',
+      });
+    }
+  } catch {
+    ElMessage({
+      type: 'info',
+      message: 'Eliminación cancelada',
+    });
+  }
+};
 
 const gradoSeleccionado = ref(null)
 const areas = ref([])
@@ -1832,7 +1869,9 @@ const cambiarPaso = async (arriba: boolean) => {
         prepararPaso1();
         break;
       case 1:
-        guardarPaso1();
+        if (await guardarPaso1() == false) {
+          return;
+        }
         if (form2.requiere_ajuste == true) {
           //si hay asignatura falta
           console.log(asignaturasSeleccionadas.value);
@@ -1842,7 +1881,6 @@ const cambiarPaso = async (arriba: boolean) => {
           } else {
             ElMessage.error('Oops, Almenos seleccione una area.')
           }
-
         } else {
           paso.value = 3
         }
@@ -1855,8 +1893,12 @@ const cambiarPaso = async (arriba: boolean) => {
         paso.value = 3
         break;
 
+      case 3:
+        guardarpaso4();
+        paso.value = 4;
+        break;
       case 4:
-
+         router.push('/admin/piarPDF/' + idEstudiante.value+'/'+ idPiar.value);
         break;
       default:
         paso.value = paso.value + 1
@@ -1868,26 +1910,10 @@ const cambiarPaso = async (arriba: boolean) => {
       case 0:
 
         break;
-      case 2:
-        if (form2.requiere_ajuste == true) {
-          //si hay asignatura falta
-          console.log(asignaturasSeleccionadas.value);
-          if (asignaturasSeleccionadas.value.length > 0) {
-            await prepararPaso2();
-            paso.value = 1
-            subpaso.value = 0
-          } else {
-            ElMessage.error('Oops, Almenos seleccione una area.')
-          }
 
-        } else {
-          paso.value = 1
-        }
-
-
-        break;
       default:
-        paso.value = paso.value - 1
+        paso.value = paso.value - 1;
+        subpaso.value = 0;
         break;
     }
   }
@@ -1997,40 +2023,92 @@ const prepararPaso1 = async () => {
   }
 };
 
-const guardarPaso1 = async () => {
-  console.log(form2);
-  let enviar = [
-    idEstudiante.value,
-    form2.requiere_ajuste,
-    form2.trabaja_duba,
-    form2.justificacion]
+const guardarpaso4 = async () => {
+  try {
+    console.log(actividad_compromiso.value);
+    const resultado = actividad_compromiso.value.map(item => ({
+      area: item.nombre_actividad,
+      descripcion: item.descripcion,
+      id: item.compromiso_id
+    }));
+    const hoy = new Date().toISOString().split('T')[0];
 
-  const param = { spName: "fn_guardar_estudiante_ajustes", params: enviar };
-  const res = await GeneralService.ejecutarSP("fn_guardar_estudiante_ajustes", param);
-  const inco = res;
-  if (inco) {
-    console.log(inco);
-    // form2.requiere_ajuste = inco?.[0]?.sp_obtener_
-    // informacion_barrera.value = inco;
-  }
+    const enviar1 = [
+      idPiar.value,
+      actividad_compromiso.value[0].acudiente_id,
+      actividad_compromiso.value[0].docente_id,
+      hoy,
+      JSON.stringify(resultado),
+      actividad_compromiso.value[0].frecuencia,
+      'Pendiente'
+    ];
 
-  console.log(areas.value);
+    const param1 = { spName: "sp_guardar_compromiso_actividades", params: enviar1 };
+    const res1 = await GeneralService.ejecutarSP("sp_guardar_compromiso_actividades", param1);
+    debugger
+    if (!res1 || res1.error) {
+      console.error("Error al guardar ajustes:", res1?.error || res1);
+      return false;
+    }
 
-  let enviar2 = [
-    idEstudiante.value,
-    JSON.stringify([{ "area_id": 6, "requiere_ajuste": true }, { "area_id": 3, "requiere_ajuste": false }])
-  ]
 
-  const param2 = { spName: "fn_asignar_multiples_areas_ajuste", params: enviar2 };
-  const res2 = await GeneralService.ejecutarSP("fn_asignar_multiples_areas_ajuste", param2);
-  const inco2 = res2;
-  if (inco2) {
-    console.log(inco2);
-    // form2.requiere_ajuste = inco?.[0]?.sp_obtener_
-    // informacion_barrera.value = inco;
-
+  } catch (error) {
+    console.error("Error inesperado en guardarPaso1:", error);
+    return false;
   }
 };
+
+
+const guardarPaso1 = async () => {
+  try {
+    // Guardar cabecera
+    const enviar1 = [
+      idEstudiante.value,
+      form2.requiere_ajuste,
+      form2.trabaja_duba,
+      form2.justificacion
+    ];
+
+    const param1 = { spName: "fn_guardar_estudiante_ajustes", params: enviar1 };
+    const res1 = await GeneralService.ejecutarSP("fn_guardar_estudiante_ajustes", param1);
+
+    if (!res1 || res1.error) {
+      console.error("Error al guardar ajustes:", res1?.error || res1);
+      return false;
+    }
+
+    // Guardar detalle (áreas)
+    const enviar2 = [
+      idEstudiante.value,
+      idPiar.value,
+      JSON.stringify(
+        areas.value.map((area: any) => ({
+          area_id: area.area_id,
+          requiere_ajuste: asignaturasSeleccionadas.value.some(
+            s => s.area_id === area.area_id
+          )
+        }))
+      )
+    ];
+
+    const param2 = { spName: "fn_asignar_multiples_areas_ajuste", params: enviar2 };
+    const res2 = await GeneralService.ejecutarSP("fn_asignar_multiples_areas_ajuste", param2);
+
+    if (!res2 || res2.error) {
+      console.error("Error al asignar áreas:", res2?.error || res2);
+      return false;
+    }
+
+    // Si todo salió bien
+    console.log("Se guardó con éxito.");
+    return true;
+
+  } catch (error) {
+    console.error("Error inesperado en guardarPaso1:", error);
+    return false;
+  }
+};
+
 
 const prepararPaso3 = async () => {
   paso.value = 1;
@@ -2239,7 +2317,7 @@ const prepararPaso2 = async (): Promise<void> => {
 
 const onChangeCategoria = async (areaId: string | number, categoriaId: number | null): Promise<void> => {
   const form = formularios[areaId] ?? (formularios[areaId] = crearFormularioAsignatura());
-  form.periodo = "1"
+
   form.categoriaId = categoriaId;
   const categoria = categoriasBarreras.value.find(c => c.categoria_id === categoriaId);
   formularios[areaId].descripcionCategoria = categoria ? categoria.descripcion : "Seleccione una barrera";
@@ -2375,6 +2453,7 @@ const eliminarBarrera = (areaId: string | number, index: number): void => {
 };
 
 const guardarAsignatura = async (area: any) => {
+  debugger
   let dataEnviar = formularios[area];
   console.log(dataEnviar)
   const mappedArray = [
@@ -2395,6 +2474,7 @@ const guardarAsignatura = async (area: any) => {
     ElMessage.success("Datos guardados correctamente");
 
     await prepararPaso2();
+    debugger
     subpaso.value = 0;
   } catch (e) {
     console.error(e);
@@ -2460,7 +2540,7 @@ const barrerasUnicas = computed(() => {
         if (!mapa.has(b.detalle_id)) {
           mapa.set(b.detalle_id, {
             detalle_id: b.detalle_id,
-            descripcion_subcategoria: b.descripcion_subcategoria
+            nombre_subcategoria: b.nombre_subcategoria
           })
         }
       })
@@ -2479,6 +2559,7 @@ function agregarBarreras(area: any, periodo: any) {
   if (area_formulario.value) {
     formularios[area_formulario.value] = crearFormularioAsignatura();
   }
+  debugger
   formularios[area_formulario.value].nombreAsignatura = area.nombre_area;
   formularios[area_formulario.value].periodo = periodo;
   console.log(formularios[area_formulario.value])

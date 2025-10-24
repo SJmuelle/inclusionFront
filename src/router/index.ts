@@ -43,6 +43,12 @@ const routes = [
         meta: { requireAuth: true },
       },
       {
+        path: 'piarPDF/:idEstudiante/:idPiar',
+        name: 'piarPDF',
+        component: () => import('../views/piar/piarPDF.vue'),
+        meta: { requireAuth: true },
+      },
+      {
         path: 'seguimiento',
         name: 'seguimiento',
         component: () => import('../views/seguimiento/SeguimientoForm.vue'),
